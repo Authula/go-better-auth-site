@@ -2,9 +2,15 @@
 title: Admin Plugin
 ---
 
+## Overview
+
 This plugin provides administrative operations for managing users, accounts, sessions, and user impersonation. It enables system administrators to perform CRUD operations on users and accounts, manage user and session states (banning, revoking sessions), control impersonation activities and more.
 
-## Standalone Mode
+---
+
+## Configuration
+
+### Standalone Mode
 
 ```toml
 [plugins.admin]
@@ -12,7 +18,7 @@ enabled = true
 impersonation_max_expires_in = "15m"
 ```
 
-## Library Mode
+### Library Mode
 
 ```go
 import (
@@ -22,11 +28,59 @@ import (
 
 adminplugin.New(adminplugintypes.AdminPluginConfig{
   Enabled: true,
-  ImpersonationMaxExpiresIn: time.Minute * 15,
+  ImpersonationMaxExpiresIn: 15 * time.Minute,
 }),
 ```
 
-## Supported Methods
+---
+
+## Database Schema
+
+### admin_impersonations Table
+
+| Column                   | Type      |
+| ------------------------ | --------- |
+| id                       | string    |
+| actor_user_id            | string    |
+| target_user_id           | string    |
+| actor_session_id         | string    |
+| impersonation_session_id | string    |
+| reason                   | string    |
+| started_at               | timestamp |
+| expires_at               | timestamp |
+| ended_at                 | timestamp |
+| ended_by_user_id         | string    |
+| created_at               | timestamp |
+| updated_at               | timestamp |
+
+### admin_user_states Table
+
+| Column            | Type      |
+| ----------------- | --------- |
+| user_id           | string    |
+| banned            | boolean   |
+| banned_at         | timestamp |
+| banned_until      | timestamp |
+| banned_reason     | string    |
+| banned_by_user_id | string    |
+| created_at        | timestamp |
+| updated_at        | timestamp |
+
+### admin_session_states Table
+
+| Column                   | Type      |
+| ------------------------ | --------- |
+| session_id               | string    |
+| revoked_at               | timestamp |
+| revoked_reason           | string    |
+| revoked_by_user_id       | string    |
+| impersonator_user_id     | string    |
+| impersonation_reason     | string    |
+| impersonation_expires_at | timestamp |
+| created_at               | timestamp |
+| updated_at               | timestamp |
+
+## API Reference
 
 ### User Management
 
