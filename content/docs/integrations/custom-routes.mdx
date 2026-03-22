@@ -5,7 +5,7 @@ description: Configure custom routes in your application to extend the library's
 
 ## Adding Custom Routes
 
-GoBetterAuth allows you to add custom API endpoints to your application. This is useful for adding features or handling custom logic.
+Authula allows you to add custom API endpoints to your application. This is useful for adding features or handling custom logic.
 
 ### How It Works
 
@@ -15,8 +15,8 @@ You can register custom routes using the `RegisterCustomRoute` method. Each rout
 import (
   "net/http"
 
-  gobetterauthconfig "github.com/GoBetterAuth/go-better-auth/v2/config"
-  gobetterauthmodels "github.com/GoBetterAuth/go-better-auth/v2/models"
+  authulaconfig "github.com/Authula/authula/config"
+  authulamodels "github.com/Authula/authula/models"
 )
 
 type Route struct {
@@ -47,15 +47,15 @@ import (
   "encoding/json"
   "net/http"
 
-  gobetterauth "github.com/GoBetterAuth/go-better-auth/v2"
-  gobetterauthconfig "github.com/GoBetterAuth/go-better-auth/v2/config"
-  gobetterauthmodels "github.com/GoBetterAuth/go-better-auth/v2/models"
+  authula "github.com/Authula/authula"
+  authulaconfig "github.com/Authula/authula/config"
+  authulamodels "github.com/Authula/authula/models"
 )
 
-config := gobetterauthconfig.NewConfig(/*...*/)
-auth := gobetterauth.New(config)
+config := authulaconfig.NewConfig(/*...*/)
+auth := authula.New(config)
 
-auth.RegisterCustomRoute(gobetterauthmodels.Route{
+auth.RegisterCustomRoute(authulamodels.Route{
   Method: "GET",
   Path:   "example",
   Handler: http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
@@ -81,16 +81,16 @@ import (
   "encoding/json"
   "net/http"
 
-  gobetterauth "github.com/GoBetterAuth/go-better-auth/v2"
-  gobetterauthconfig "github.com/GoBetterAuth/go-better-auth/v2/config"
-  gobetterauthmodels "github.com/GoBetterAuth/go-better-auth/v2/models"
+  authula "github.com/Authula/authula"
+  authulaconfig "github.com/Authula/authula/config"
+  authulamodels "github.com/Authula/authula/models"
 )
 
-config := gobetterauthconfig.NewConfig(/*...*/)
+config := authulaconfig.NewConfig(/*...*/)
 
-goBetterAuth := gobetterauth.New(config)
+auth := authula.New(config)
 
-goBetterAuth.RegisterCustomRoute(gobetterauthmodels.Route{
+auth.RegisterCustomRoute(authulamodels.Route{
   Method: "POST",
   Path:   "send-message",
   Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -126,7 +126,7 @@ Health check endpoint.
 
 ```go
 // Health check endpoint
-goBetterAuth.RegisterCustomRoute(gobetterauthmodels.Route{
+auth.RegisterCustomRoute(authulamodels.Route{
   Method:   "GET",
   Path:     "/api/health",
   Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -144,12 +144,12 @@ goBetterAuth.RegisterCustomRoute(gobetterauthmodels.Route{
 When handling requests in your custom routes, you can access the custom `RequestContext` which provides a structured abstraction for passing context through request lifecycle hooks. It encapsulates all request-related information and provides control mechanisms for hooks and is also accessible within routes. It is actually advised to use the `RequestContext` as it comes with handy utility methods and also is the main request object being passed through the lifecycle of the http request/response which also means you can make modifications to it and it will persist throughout the lifecycle. For example, a hook may have already modified some data in the `RequestContext`, you can then access that modified data in your custom route handler.
 
 ```go
-goBetterAuth.RegisterCustomRoute(gobetterauthmodels.Route{
+auth.RegisterCustomRoute(authulamodels.Route{
   Method:   "GET",
   Path:     "/api/custom",
   Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
     // You can access it like so:
-    reqCtx, _ := gobetterauthmodels.GetRequestContext(r.Context())
+    reqCtx, _ := authulamodels.GetRequestContext(r.Context())
     reqCtx.SetJSONResponse(http.StatusOK, map[string]any{
       "status": "ok",
     })

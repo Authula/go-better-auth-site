@@ -3,7 +3,7 @@ title: Database Hooks
 description: Configure database hooks to run custom logic before and after database operations.
 ---
 
-GoBetterAuth provides powerful hooks to let you run custom logic before and after database operations for users, accounts, sessions, verifications and more. This allows you to integrate with your own systems, perform validations, trigger side effects, or log activity.
+Authula provides powerful hooks to let you run custom logic before and after database operations for users, accounts, sessions, verifications and more. This allows you to integrate with your own systems, perform validations, trigger side effects, or log activity.
 
 ## Config
 
@@ -50,19 +50,19 @@ Suppose you want to log every time a user is created in your system. You can use
 import (
 	"log"
 
-	gobetterauth "github.com/GoBetterAuth/go-better-auth/v2"
-	gobetterauthconfig "github.com/GoBetterAuth/go-better-auth/v2/config"
-	gobetterauthmodels "github.com/GoBetterAuth/go-better-auth/v2/models"
+	authula "github.com/Authula/authula"
+	authulaconfig "github.com/Authula/authula/config"
+	authulamodels "github.com/Authula/authula/models"
 )
 
-func logUserCreation(user gobetterauthmodels.User) error {
+func logUserCreation(user authulamodels.User) error {
 	log.Printf("New user created - ID: %s, Email: %s", user.ID, user.Email)
 	return nil
 }
 
-config := gobetterauthconfig.NewConfig(
-	gobetterauthconfig.WithCoreDatabaseHooks(gobetterauthmodels.CoreDatabaseHooksConfig{
-		Users: &gobetterauthmodels.UserDatabaseHooksConfig{
+config := authulaconfig.NewConfig(
+	authulaconfig.WithCoreDatabaseHooks(authulamodels.CoreDatabaseHooksConfig{
+		Users: &authulamodels.UserDatabaseHooksConfig{
 			AfterCreate: logUserCreation,
 		},
 	}),
@@ -83,7 +83,7 @@ Each hook has a parameter to the entity being created/updated. For "before" hook
 ## How to Integrate
 
 1. **Implement your hook functions** matching the required signature.
-2. **Pass them to the appropriate field** in the `CoreDatabaseHooksConfig` when creating your GoBetterAuth config.
+2. **Pass them to the appropriate field** in the `CoreDatabaseHooksConfig` when creating your Authula config.
 3. **Return an error** from your hook to abort the operation, or `nil` to continue.
 
 See the [Config Reference](/docs/reference/config) for the full structure and all available hooks.

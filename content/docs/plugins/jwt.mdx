@@ -30,18 +30,18 @@ refresh_grace_period = "10s"           # Grace period for refresh token reuse de
 
 ## Library Mode
 
-To use the plugin programmatically, instantiate it as part of the plugins array when creating a new GoBetterAuth instance:
+To use the plugin programmatically, instantiate it as part of the plugins array when creating a new Authula instance:
 
 ```go
 jwtplugin.New(jwtplugintypes.JWTPluginConfig{
-	Enabled:                true,
-	Algorithm:              jwtplugintypes.JWTAlgEdDSA,
-	ExpiresIn:              time.Minute,
-	KeyRotationInterval:    time.Hour * 24 * 30,
-	KeyRotationGracePeriod: time.Hour,
-	RefreshExpiresIn:       time.Hour * 24 * 7,
-	JWKSCacheTTL:           time.Minute * 5,
-	RefreshGracePeriod:     time.Minute,
+  Enabled:                true,
+  Algorithm:              jwtplugintypes.JWTAlgEdDSA,
+  ExpiresIn:              time.Minute,
+  KeyRotationInterval:    time.Hour * 24 * 30,
+  KeyRotationGracePeriod: time.Hour,
+  RefreshExpiresIn:       time.Hour * 24 * 7,
+  JWKSCacheTTL:           time.Minute * 5,
+  RefreshGracePeriod:     time.Minute,
 })
 ```
 

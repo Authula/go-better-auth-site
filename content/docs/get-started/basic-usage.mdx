@@ -68,32 +68,32 @@ import (
 
 	"github.com/joho/godotenv"
 
-	gobetterauth "github.com/GoBetterAuth/go-better-auth/v2"
-	gobetterauthconfig "github.com/GoBetterAuth/go-better-auth/v2/config"
-	gobetterauthmodels "github.com/GoBetterAuth/go-better-auth/v2/models"
-	emailplugin "github.com/GoBetterAuth/go-better-auth/v2/plugins/email"
-	emailpasswordplugin "github.com/GoBetterAuth/go-better-auth/v2/plugins/email-password"
-	emailpasswordplugintypes "github.com/GoBetterAuth/go-better-auth/v2/plugins/email-password/types"
-	emailplugintypes "github.com/GoBetterAuth/go-better-auth/v2/plugins/email/types"
-	sessionplugin "github.com/GoBetterAuth/go-better-auth/v2/plugins/session"
+	authula "github.com/Authula/authula"
+	authulaconfig "github.com/Authula/authula/config"
+	authulamodels "github.com/Authula/authula/models"
+	emailplugin "github.com/Authula/authula/plugins/email"
+	emailpasswordplugin "github.com/Authula/authula/plugins/email-password"
+	emailpasswordplugintypes "github.com/Authula/authula/plugins/email-password/types"
+	emailplugintypes "github.com/Authula/authula/plugins/email/types"
+	sessionplugin "github.com/Authula/authula/plugins/session"
 )
 
 func main() {
 	_ = godotenv.Load(".env")
 
-	config := gobetterauthconfig.NewConfig(
-		gobetterauthconfig.WithAppName("YourAppName"),
-		gobetterauthconfig.WithDatabase(gobetterauthmodels.DatabaseConfig{
+	config := authulaconfig.NewConfig(
+		authulaconfig.WithAppName("YourAppName"),
+		authulaconfig.WithDatabase(authulamodels.DatabaseConfig{
 			Provider: "sqlite",
 			URL:      "app.db",
 		}),
 		// Or for PostgreSQL
-		// gobetterauthconfig.WithDatabase(gobetterauthmodels.DatabaseConfig{
+		// authulaconfig.WithDatabase(authulamodels.DatabaseConfig{
 		//		Provider:         "postgres",
 		//		ConnectionString: os.Getenv("DATABASE_URL"),
 		// }),
-		gobetterauthconfig.WithRouteMappings(
-			[]gobetterauthmodels.RouteMapping{
+		authulaconfig.WithRouteMappings(
+			[]authulamodels.RouteMapping{
 				{
 					Path:    "/me",
 					Method:  "GET",
@@ -108,9 +108,9 @@ func main() {
 		),
 	)
 
-	auth := gobetterauth.New(&gobetterauth.AuthConfig{
+	auth := authula.New(&authula.AuthConfig{
 		Config: config,
-		Plugins: []gobetterauthmodels.Plugin{
+		Plugins: []authulamodels.Plugin{
 			emailplugin.New(emailplugintypes.EmailPluginConfig{
 				Enabled:     true,
 				Provider:    emailplugintypes.ProviderSMTP,
@@ -190,5 +190,5 @@ curl -X POST http://localhost:8080/auth/sign-in \
 
 ```bash
 curl -X GET http://localhost:8080/auth/me \
-  -H "Cookie: gobetterauth.session_token=your-session-token"
+  -H "Cookie: authula.session_token=your-session-token"
 ```

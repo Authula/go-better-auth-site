@@ -1,11 +1,11 @@
 ---
 title: Installation
-description: Configure GoBetterAuth in your project.
+description: Configure Authula in your project.
 ---
 
 import { Step, Steps } from "fumadocs-ui/components/steps";
 
-There are two ways to configure GoBetterAuth in your project: as a standalone server or as a library integrated into your existing API server.
+There are two ways to configure Authula in your project: as a standalone server or as a library integrated into your existing API server.
 
 The following sections will guide you through both methods.
 
@@ -22,7 +22,7 @@ The following sections will guide you through both methods.
 - It is recommended that you do not set secret values within the `config.toml` file directly. Instead, use environment variables to manage sensitive information securely.
 
 ```toml title="config.toml"
-app_name = "GoBetterAuth"
+app_name = "Authula"
 base_url = "http://localhost:8080"
 base_path = "/auth"
 
@@ -44,16 +44,16 @@ provider = "postgres"
 
 ```txt title=".env"
 # Path to your configuration file (e.g., ./config.toml) (optional)
-GO_BETTER_AUTH_CONFIG_PATH=
+AUTHULA_CONFIG_PATH=
 
 # The base URL of your API
-GO_BETTER_AUTH_BASE_URL=
+AUTHULA_BASE_URL=
 
 # Used for encryption. Generate using `openssl rand -base64 50 | tr -dc 'A-Za-z0-9' | cut -c -40`
-GO_BETTER_AUTH_SECRET=
+AUTHULA_SECRET=
 
 # sqlite/postgres/mysql connection string
-GO_BETTER_AUTH_DATABASE_URL=
+AUTHULA_DATABASE_URL=
 ```
 
 </Step>
@@ -66,10 +66,10 @@ GO_BETTER_AUTH_DATABASE_URL=
 $ docker run -itd \
   -p 8080:8080 \
   -v $(pwd)/config.toml:/home/appuser/config.toml \
-  -e GO_BETTER_AUTH_BASE_URL=http://localhost:8080 \
-  -e GO_BETTER_AUTH_SECRET=my-app-secret \
-  -e GO_BETTER_AUTH_DATABASE_URL=<your_connection_string> \
-  ghcr.io/gobetterauth/go-better-auth:latest
+  -e AUTHULA_BASE_URL=http://localhost:8080 \
+  -e AUTHULA_SECRET=my-app-secret \
+  -e AUTHULA_DATABASE_URL=<your_connection_string> \
+  ghcr.io/authula/authula:latest
 ```
 
 </Step>
@@ -89,13 +89,13 @@ Create a `.env` file in the root of your project and add the following environme
 
 ```txt title=".env"
 # The base URL of your API
-GO_BETTER_AUTH_BASE_URL=
+AUTHULA_BASE_URL=
 
 # Used for encryption. Generate using `openssl rand -base64 50 | tr -dc 'A-Za-z0-9' | cut -c -40`
-GO_BETTER_AUTH_SECRET=
+AUTHULA_SECRET=
 
 # sqlite/postgres/mysql connection string
-GO_BETTER_AUTH_DATABASE_URL=
+AUTHULA_DATABASE_URL=
 ```
 
 </Step>
@@ -105,7 +105,7 @@ GO_BETTER_AUTH_DATABASE_URL=
 ### Install the Package
 
 ```bash
-$ go get github.com/GoBetterAuth/go-better-auth/v2
+$ go get github.com/Authula/authula
 ```
 
 </Step>
@@ -116,12 +116,12 @@ $ go get github.com/GoBetterAuth/go-better-auth/v2
 
 ```go
 import (
-  gobetterauth "github.com/GoBetterAuth/go-better-auth/v2"
-  gobetterauthconfig "github.com/GoBetterAuth/go-better-auth/v2/config"
+  authula "github.com/Authula/authula"
+  authulaconfig "github.com/Authula/authula/config"
 )
 
-config := gobetterauthconfig.NewConfig(/*...*/)
-auth := gobetterauth.New(&gobetterauth.AuthConfig{
+config := authulaconfig.NewConfig(/*...*/)
+auth := authula.New(&authula.AuthConfig{
   Config:  config,
   Plugins: [/*...*/],
 })
@@ -133,7 +133,7 @@ auth := gobetterauth.New(&gobetterauth.AuthConfig{
 
 ### Configure database
 
-GoBetterAuth supports multiple database providers. You can select a database provider by supplying it in the config.
+Authula supports multiple database providers. You can select a database provider by supplying it in the config.
 
 <CodeBlockTabs defaultValue="sqlite" groupId="database-provider" persist>
     <CodeBlockTabsList>
@@ -152,8 +152,8 @@ GoBetterAuth supports multiple database providers. You can select a database pro
 
     <CodeBlockTab value="sqlite">
       ```go
-      gobetterauthconfig.NewConfig(
-        gobetterauthconfig.WithDatabase(gobetterauthmodels.DatabaseConfig{
+      authulaconfig.NewConfig(
+        authulaconfig.WithDatabase(authulamodels.DatabaseConfig{
           Provider:   "sqlite",
         }),
       )
@@ -162,8 +162,8 @@ GoBetterAuth supports multiple database providers. You can select a database pro
 
     <CodeBlockTab value="postgres">
       ```go
-      gobetterauthconfig.NewConfig(
-        gobetterauthconfig.WithDatabase(gobetterauthmodels.DatabaseConfig{
+      authulaconfig.NewConfig(
+        authulaconfig.WithDatabase(authulamodels.DatabaseConfig{
           Provider:   "postgres",
         }),
       )
@@ -172,8 +172,8 @@ GoBetterAuth supports multiple database providers. You can select a database pro
 
     <CodeBlockTab value="mysql">
       ```go
-      gobetterauthconfig.NewConfig(
-        gobetterauthconfig.WithDatabase(gobetterauthmodels.DatabaseConfig{
+      authulaconfig.NewConfig(
+        authulaconfig.WithDatabase(authulamodels.DatabaseConfig{
           Provider:   "mysql",
         }),
       )
@@ -188,7 +188,7 @@ GoBetterAuth supports multiple database providers. You can select a database pro
 
 ### Database migrations
 
-GoBetterAuth runs all migrations (core & plugins) automatically when you create a new instance of the library so all the relevant database tables are created for you without any additional steps. This is done via [goose](https://github.com/pressly/goose) and migration files are embedded in the binary. But GoBetterAuth also provides migration files which you can run manually against your database which you can find within the `migrations/` directories within the repository.
+Authula runs all migrations (core & plugins) automatically when you create a new instance of the library so all the relevant database tables are created for you without any additional steps. This is done via [goose](https://github.com/pressly/goose) and migration files are embedded in the binary. But Authula also provides migration files which you can run manually against your database which you can find within the `migrations/` directories within the repository.
 
 </Step>
 
@@ -196,18 +196,18 @@ GoBetterAuth runs all migrations (core & plugins) automatically when you create 
 
 ### Authentication Methods
 
-Configure the authentication methods you want to use by choosing from the available plugins. GoBetterAuth supports the Email/Password authentication method as a plugin and also OAuth2 providers such as Discord, GitHub and Google with more coming soon.
+Configure the authentication methods you want to use by choosing from the available plugins. Authula supports the Email/Password authentication method as a plugin and also OAuth2 providers such as Discord, GitHub and Google with more coming soon.
 
 ```go
 import (
-  gobetterauth "github.com/GoBetterAuth/go-better-auth/v2"
-  gobetterauthconfig "github.com/GoBetterAuth/go-better-auth/v2/config"
-  emailpasswordplugin "github.com/GoBetterAuth/go-better-auth/v2/plugins/email-password"
-  emailpasswordplugintypes "github.com/GoBetterAuth/go-better-auth/v2/plugins/email-password/types"
+  authula "github.com/Authula/authula"
+  authulaconfig "github.com/Authula/authula/config"
+  emailpasswordplugin "github.com/Authula/authula/plugins/email-password"
+  emailpasswordplugintypes "github.com/Authula/authula/plugins/email-password/types"
 )
 
-config := gobetterauthconfig.NewConfig(/*...*/)
-auth := gobetterauth.New(&gobetterauth.AuthConfig{
+config := authulaconfig.NewConfig(/*...*/)
+auth := authula.New(&authula.AuthConfig{
   Config:  config,
   Plugins: [
     emailpasswordplugin.New(emailpasswordplugintypes.EmailPasswordPluginConfig{
@@ -229,14 +229,14 @@ auth := gobetterauth.New(&gobetterauth.AuthConfig{
 
 ### Mount Handlers
 
-To handle API requests, you need to integrate the GoBetterAuth handlers in your API.
+To handle API requests, you need to integrate the Authula handlers in your API.
 
 This is an example of how it can be done with the standard library server:
 
 ```go
 // Initialise auth
-config := gobetterauthconfig.NewConfig(/*...*/)
-auth := gobetterauth.New(&gobetterauth.AuthConfig{
+config := authulaconfig.NewConfig(/*...*/)
+auth := authula.New(&authula.AuthConfig{
   Config:  config,
   Plugins: [/*...*/],
 })

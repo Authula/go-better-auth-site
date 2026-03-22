@@ -1,11 +1,11 @@
 ---
 title: Hooks
-description: Configure hooks to customise the HTTP request/response lifecycle in GoBetterAuth.
+description: Configure hooks to customise the HTTP request/response lifecycle in Authula.
 ---
 
 ## Overview
 
-The hooks system in GoBetterAuth provides a flexible and extensible mechanism for plugins to intercept and modify the request lifecycle. Hooks allow you to execute custom logic at specific points during request processing without tightly coupling your code to the router.
+The hooks system in Authula provides a flexible and extensible mechanism for plugins to intercept and modify the request lifecycle. Hooks allow you to execute custom logic at specific points during request processing without tightly coupling your code to the router.
 
 The system enables powerful capabilities such as authentication, authorization, rate limiting, logging, and custom business logic integration. Each hook operates within the request context and can modify request state, share data with other hooks, or short-circuit the request flow.
 
@@ -315,6 +315,6 @@ rateLimitHook := models.Hook{
 - Audit trails
 - Notification triggers
 
-The hooks system provides a powerful and flexible foundation for extending Go Better Auth's functionality while maintaining clean separation of concerns between different aspects of your authentication and authorization logic.
+The hooks system provides a powerful and flexible foundation for extending Authula's functionality while maintaining clean separation of concerns between different aspects of your authentication and authorization logic.
 
-NOTE: this documentation explains a general overview of the hooks system but bear in mind that GoBetterAuth may already contain a lot of this functionality already as plugins so you may not need to implement the things that are mentioned under "use cases" in your own project etc. So take a look at the [Plugins](/docs/guides/plugins) documentation next to see what is already available!
+NOTE: this documentation explains a general overview of the hooks system but bear in mind that Authula may already contain a lot of this functionality already as plugins so you may not need to implement the things that are mentioned under "use cases" in your own project etc. So take a look at the [Plugins](/docs/guides/plugins) documentation next to see what is already available!

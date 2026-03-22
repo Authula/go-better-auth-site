@@ -1,11 +1,11 @@
 ---
 title: Server-Side Plugins
-description: Extend GoBetterAuth functionality with custom plugins via Go.
+description: Extend Authula functionality with custom plugins via Go.
 ---
 
 ## Overview
 
-The GoBetterAuth plugin system provides a flexible and extensible architecture that allows developers to extend the authentication framework with custom functionality. The plugin system is designed around interfaces and follows a modular approach that enables:
+The Authula plugin system provides a flexible and extensible architecture that allows developers to extend the authentication framework with custom functionality. The plugin system is designed around interfaces and follows a modular approach that enables:
 
 - Easy integration of new authentication methods
 - Custom hooks and routing
@@ -224,7 +224,7 @@ type HookMatcher func(reqCtx *RequestContext) bool
 type HookHandler func(reqCtx *RequestContext) error
 ```
 
-You can find all the info regarding context here: [RequestContext](https://github.com/GoBetterAuth/go-better-auth/blob/main/models/context.go)
+You can find all the info regarding context here: [RequestContext](https://github.com/Authula/authula/blob/main/models/context.go)
 
 Common helper methods:
 
@@ -320,8 +320,8 @@ import (
     "context"
     "net/http"
 
-    "github.com/GoBetterAuth/go-better-auth/v2/models"
-    "github.com/GoBetterAuth/go-better-auth/v2/services"
+    "github.com/Authula/authula/models"
+    "github.com/Authula/authula/services"
 )
 
 type MyPlugin struct {
@@ -460,18 +460,18 @@ To use your plugin, you need to add it to your plugins array in library mode:
 
 ```go
 import (
-    gobetterauth "github.com/GoBetterAuth/go-better-auth/v2"
-    gobetterauthconfig "github.com/GoBetterAuth/go-better-auth/v2/config"
-    gobetterauthmodels "github.com/GoBetterAuth/go-better-auth/v2/models"
+    authula "github.com/Authula/authula"
+    authulaconfig "github.com/Authula/authula/config"
+    authulamodels "github.com/Authula/authula/models"
 
     myplugin "path/to/your/plugin"
     myplugintypes "path/to/your/plugin/types"
 )
 
-config := gobetterauthconfig.NewConfig(/*...*/)
-auth := gobetterauth.New(gobetterauth.AuthConfig{
+config := authulaconfig.NewConfig(/*...*/)
+auth := authula.New(authula.AuthConfig{
     Config: config,
-    Plugins: []gobetterauthmodels.Plugin{
+    Plugins: []authulamodels.Plugin{
         myplugin.New(myplugintypes.MyPluginConfig{
             Enabled: true,
             APIKey:  "your-api-key",
@@ -537,7 +537,7 @@ import (
     "strings"
     "time"
 
-    "github.com/GoBetterAuth/go-better-auth/v2/models"
+    "github.com/Authula/authula/models"
 )
 
 type LoggerPlugin struct {

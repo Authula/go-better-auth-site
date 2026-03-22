@@ -33,9 +33,9 @@ export default function DeveloperExperienceSection() {
               Built Natively in Go
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl">
-              No complex frameworks or adapters needed. GoBetterAuth works with
-              the standard library and integrates seamlessly into your existing
-              Go stack.
+              No complex frameworks or adapters needed. Authula works with the
+              standard library and integrates seamlessly into your existing Go
+              stack.
             </p>
           </div>
 

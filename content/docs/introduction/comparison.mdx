@@ -1,9 +1,9 @@
 ---
 title: Comparison
-description: Comparing GoBetterAuth with other solutions
+description: Comparing Authula with other solutions
 ---
 
-GoBetterAuth is a batteries-included authentication framework for Go. It unifies common auth needs in the form of powerful and flexible plugins that can practically handle anything related to auth. Some of which come built-in such as: email/password with various flows, OAuth providers, session and token handling, hooks, plugins, and adapters for databases/Redis so teams avoid stitching many small libraries together. It focuses solely on the authentication layer — a crucial part of any app — and is designed to be stable, secure, and production-ready. You can adopt GoBetterAuth without replacing other parts of your stack; it integrates cleanly with existing services and frameworks. It emphasises performance, low operational overhead, and an explicit extension model (hooks, event bus, plugins).
+Authula is a batteries-included authentication framework for Go. It unifies common auth needs in the form of powerful and flexible plugins that can practically handle anything related to auth. Some of which come built-in such as: email/password with various flows, OAuth providers, session and token handling, hooks, plugins, and adapters for databases/Redis so teams avoid stitching many small libraries together. It focuses solely on the authentication layer — a crucial part of any app — and is designed to be stable, secure, and production-ready. You can adopt Authula without replacing other parts of your stack; it integrates cleanly with existing services and frameworks. It emphasises performance, low operational overhead, and an explicit extension model (hooks, event bus, plugins).
 
 ## Key advantages
 
@@ -14,7 +14,7 @@ GoBetterAuth is a batteries-included authentication framework for Go. It unifies
 
 ## Benefits in the Go Ecosystem
 
-The Go community has long struggled with fragmented auth tools, often requiring integrations with external services or custom code that increases technical debt. A library like GoBetterAuth is invaluable because:
+The Go community has long struggled with fragmented auth tools, often requiring integrations with external services or custom code that increases technical debt. A library like Authula is invaluable because:
 
 - **Rapid Development:** Its configurability accelerates prototyping and production deployment, allowing teams to focus on business logic rather than auth boilerplate.
 
@@ -22,15 +22,15 @@ The Go community has long struggled with fragmented auth tools, often requiring 
 
 - **Community and Extensibility:** With support for plugins and hooks, it fosters a vibrant ecosystem where developers can extend functionality (e.g., adding custom plugins and more) without forking the library.
 
-In summary, GoBetterAuth isn't just another auth library — it's a game-changer for Go developers, offering the flexibility and robustness the ecosystem needs to build secure, user-friendly applications.
+In summary, Authula isn't just another auth library — it's a game-changer for Go developers, offering the flexibility and robustness the ecosystem needs to build secure, user-friendly applications.
 
 ## How it compares
 
-- **Single-purpose Go libraries (goth, oauth2, jwt, session middleware):** Those are focused and composable, but building a full, secure system requires substantial glue (user model, migrations, verification emails, rate limits). GoBetterAuth provides the glue and conventions so teams ship faster and maintain less glue code.
+- **Single-purpose Go libraries (goth, oauth2, jwt, session middleware):** Those are focused and composable, but building a full, secure system requires substantial glue (user model, migrations, verification emails, rate limits). Authula provides the glue and conventions so teams ship faster and maintain less glue code.
 
-- **Framework-bound or monolithic OSS solutions:** Framework-tied tools may lock you to a runtime or server model. GoBetterAuth supports both in-process embedding and a standalone service model, so you can start embedded and migrate to a central service with the same semantics.
+- **Framework-bound or monolithic OSS solutions:** Framework-tied tools may lock you to a runtime or server model. Authula supports both in-process embedding and a standalone service model, so you can start embedded and migrate to a central service with the same semantics.
 
-- **Managed providers (Auth0, Firebase, hosted offerings):** Hosted services reduce ops and give enterprise features but add vendor lock-in, cost at scale, and limited deep customization. Self-hosting GoBetterAuth gives full control over data, customization, and costs.
+- **Managed providers (Auth0, Firebase, hosted offerings):** Hosted services reduce ops and give enterprise features but add vendor lock-in, cost at scale, and limited deep customization. Self-hosting Authula gives full control over data, customization, and costs.
 
 ## Go vs Others (Python/Node)
 
@@ -39,19 +39,19 @@ In summary, GoBetterAuth isn't just another auth library — it's a game-changer
 - **Type safety & reliability:** Go’s static typing and compilation catch many errors early. Others provide type safety too, but transpilation and runtime ecosystem differences can lead to more variability across deployments.
 - **Ecosystem breadth:** Other ecosystems may offer a larger number of third-party packages and faster churn, but many of those packages vary in maintenance and quality. Go provides a mature standard library and a stable, well-maintained ecosystem that reduces churn and lowers maintenance risk while still enabling extensive integrations.
 - **Smaller dependency surface & security:** Go’s rich standard library and tendency toward fewer third‑party packages mean fewer external dependencies to audit and smaller transitive dependency trees — reducing the overall attack surface compared with ecosystems (Node/Python) that commonly pull in many packages.
-- **Extensibility & speed of iteration:** Others may allow faster prototyping due to ecosystem tooling; GoBetterAuth focuses on safe, explicit extension points for production-grade customisation.
+- **Extensibility & speed of iteration:** Others may allow faster prototyping due to ecosystem tooling; Authula focuses on safe, explicit extension points for production-grade customisation.
 
 When to pick which:
 
-- Choose GoBetterAuth (Go) when you prioritise low-latency, low-resource deployments, tight control over auth logic/data residency, and a production-ready extensibility model. Note: choosing GoBetterAuth doesn't require you to replace other parts of your stack — it is intentionally scoped to the auth layer and is designed to integrate with other tech stacks e.g. outsourcing Auth to GoBetterAuth.
+- Choose Authula (Go) when you prioritise low-latency, low-resource deployments, tight control over auth logic/data residency, and a production-ready extensibility model. Note: choosing Authula doesn't require you to replace other parts of your stack — it is intentionally scoped to the auth layer and is designed to integrate with other tech stacks e.g. outsourcing Auth to Authula.
 - Choose other stacks when you need the sheer quantity of community packages (npm, pypi etc.) and prefer an ecosystem tailored for rapid prototyping; note that package maintenance and long-term stability can vary across those ecosystems.
 
 ## Pragmatic guidance
 
-- Use GoBetterAuth if you want fewer moving parts in production, deterministic performance, and strong, explicit extension points. It can be adopted as the authentication layer while you keep other services and frameworks in place.
+- Use Authula if you want fewer moving parts in production, deterministic performance, and strong, explicit extension points. It can be adopted as the authentication layer while you keep other services and frameworks in place.
 - Use smaller libraries when your needs are extremely narrow and you prefer tiny dependencies.
 - Use a hosted provider when you need SLA-backed features, compliance, and minimal engineering overhead, and vendor lock-in is acceptable.
 
 ## Bottom line
 
-GoBetterAuth reduces glue code and operational complexity while offering a flexible, production-focused extension model. Go is mature and increasingly adopted for performance-sensitive back-end and infrastructure work (including parts of AI stacks), giving projects stability, predictable operations, and a smaller runtime surface. Compared to other solutions, GoBetterAuth leverages Go's mature standard library and stable ecosystem to deliver low runtime overhead and simple deployments while providing reliable integrations and long-term stability — choose based on your team's priorities.
+Authula reduces glue code and operational complexity while offering a flexible, production-focused extension model. Go is mature and increasingly adopted for performance-sensitive back-end and infrastructure work (including parts of AI stacks), giving projects stability, predictable operations, and a smaller runtime surface. Compared to other solutions, Authula leverages Go's mature standard library and stable ecosystem to deliver low runtime overhead and simple deployments while providing reliable integrations and long-term stability — choose based on your team's priorities.

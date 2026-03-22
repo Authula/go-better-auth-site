@@ -26,7 +26,7 @@ enabled = true
 
 ```toml
 [session]
-cookie_name = "gobetterauth.session_token"
+cookie_name = "authula.session_token"
 expires_in = "168h"        # 7 days - session duration (sliding window)
 update_age = "84h"         # 3.5 days - renew when <50% life remains
 cookie_max_age = "720h"    # 30 days - absolute max cookie age
@@ -37,7 +37,7 @@ same_site = "lax"          # Options: strict, lax, none
 
 ## Library Mode
 
-To use the plugin programmatically, instantiate it as part of the plugins array when creating a new GoBetterAuth instance:
+To use the plugin programmatically, instantiate it as part of the plugins array when creating a new Authula instance:
 
 ```go
 sessionplugin.New(sessionplugin.SessionPluginConfig{

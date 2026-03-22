@@ -13,7 +13,7 @@ const libraryModeFeatures = [
   "Complete programmatic access to APIs, plugins, and service registry",
   "Seamless integration with existing Go codebases",
   "Customise compilation and build process",
-  "Unlock advanced capabilities unavailable in standalone mode"
+  "Unlock advanced capabilities unavailable in standalone mode",
 ];
 
 const standaloneModeFeatures = [
@@ -35,9 +35,9 @@ export default function ArchitectureSection() {
             Two Ways to Build
           </h2>
           <p className="text-muted-foreground text-lg">
-            GoBetterAuth is designed to grow with your needs. Embed it as a
-            library giving you full control via code, or deploy it via Docker as
-            a centralised auth service for your entire backend.
+            Authula is designed to grow with your needs. Embed it as a library
+            giving you full control via code, or deploy it via Docker as a
+            centralised auth service for your entire backend.
           </p>
         </div>
 

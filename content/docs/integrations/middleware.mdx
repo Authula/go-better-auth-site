@@ -3,12 +3,10 @@ title: Middleware
 description: Learn how to use middleware in your application to handle requests and responses.
 ---
 
-GoBetterAuth provides middleware via plugins.
+Authula provides middleware via plugins.
 
 Examples of plugins with middleware and what it does:
 
 - **Session Plugin Middleware**: checks if the user is authenticated by validating the session cookie.
 - **Bearer Plugin Middleware**: checks if the user is authenticated by validating bearer tokens in a header, typically `Authorization` header. This is dependent on the JWT Plugin being in use.
 - **CSRF**: protects state-changing (POST, PUT, PATCH, DELETE) endpoints with CSRF tokens.
-
-NOTE: it is highly recommended to instead use the hooks system in favour of middleware moving forward as middleware was kept as a legacy feature and the hooks system pretty much provides the same features as middleware with more flexibility and control over the request/response lifecycle. Middleware may be removed in an upcoming minor version e.g. `v2.x.0`.

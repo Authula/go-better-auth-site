@@ -61,7 +61,7 @@ export default function ComparisonSection() {
             Engineered for Performance
           </h2>
           <p className="text-muted-foreground text-lg">
-            GoBetterAuth brings the power of Go to authentication. Experience
+            Authula brings the power of Go to authentication. Experience
             unmatched speed, efficiency, and flexibility compared to other
             solutions.
           </p>
@@ -71,7 +71,7 @@ export default function ComparisonSection() {
           <div className="grid grid-cols-3 border-b border-sky-950 bg-blue-500/10 p-4 md:p-6 font-bold text-sm md:text-lg tracking-tight">
             <div className="col-span-1">Feature</div>
             <div className="col-span-1 text-blue-500 flex items-center gap-2">
-              GoBetterAuth
+              Authula
             </div>
             <div className="col-span-1 text-muted-foreground">Others</div>
           </div>

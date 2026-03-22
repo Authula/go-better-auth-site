@@ -8,12 +8,8 @@ export default function AnnouncementBanner() {
       <div className="p-2">
         <div className="relative flex flex-col sm:flex-row items-center justify-center text-center min-h-10 gap-1 sm:gap-2">
           <div className="flex flex-col sm:flex-row items-center gap-2 font-medium text-blue-700 dark:text-blue-300">
-            <strong className="block text-sm">
-              🚀 GoBetterAuth v2.0 is here!
-            </strong>{" "}
-            <span className="block text-sm">
-              Enjoy a brand new architecture and a powerful new plugin system.
-            </span>
+            <strong className="block text-sm"></strong>{" "}
+            <span className="block text-sm"></span>
           </div>
         </div>
       </div>

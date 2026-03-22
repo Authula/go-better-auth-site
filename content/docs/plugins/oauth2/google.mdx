@@ -1,6 +1,6 @@
 ---
 title: Google
-description: Guide on how to set up Google authentication using GoBetterAuth.
+description: Guide on how to set up Google authentication using Authula.
 ---
 
 import { Step, Steps } from "fumadocs-ui/components/steps";
@@ -19,7 +19,7 @@ import { Step, Steps } from "fumadocs-ui/components/steps";
    # Assuming base path is /api/auth
    http://localhost:8080/api/auth/oauth2/callback/google
    ```
-   For production, replace localhost with the base URL of your GoBetterAuth server (e.g. `https://api.yourdomain.com`).
+   For production, replace localhost with the base URL of your Authula server (e.g. `https://api.yourdomain.com`).
 1. Note the Client ID and Client Secret.
 
 </Step>
@@ -50,39 +50,40 @@ import (
   "os"
   "fmt"
 
-  gobetterauth "github.com/GoBetterAuth/go-better-auth/v2"
-  gobetterauthconfig "github.com/GoBetterAuth/go-better-auth/v2/config"
-  gobetterauthmodels "github.com/GoBetterAuth/go-better-auth/v2/models"
-  oauth2plugin "github.com/GoBetterAuth/go-better-auth/v2/plugins/oauth2"
-  oauth2plugintypes "github.com/GoBetterAuth/go-better-auth/v2/plugins/oauth2/types"
+  authula "github.com/Authula/authula"
+  authulaconfig "github.com/Authula/authula/config"
+  authulamodels "github.com/Authula/authula/models"
+  authulaenv "github.com/Authula/authula/env"
+  oauth2plugin "github.com/Authula/authula/plugins/oauth2"
+  oauth2plugintypes "github.com/Authula/authula/plugins/oauth2/types"
 )
 
 func main() {
-  config := gobetterauthconfig.NewConfig(
-    gobetterauthconfig.WithSecurity(gobetterauthmodels.SecurityConfig{
+  config := authulaconfig.NewConfig(
+    authulaconfig.WithSecurity(authulamodels.SecurityConfig{
       // Make sure to configure CORS and Trusted Origins appropriately
       TrustedOrigins: []string{"your frontend origin"},
-      CORS: gobetterauthmodels.CORSConfig{
+      CORS: authulamodels.CORSConfig{
         AllowCredentials: true,
         AllowedOrigins:   []string{"your frontend origin"},
       },
     }),
   )
-  auth := gobetterauth.New(&gobetterauth.AuthConfig{
+  auth := authula.New(&authula.AuthConfig{
     Config:  config,
-    Plugins: [
+    Plugins: []authulamodels.Plugin{
       oauth2plugin.New(oauth2plugintypes.OAuth2PluginConfig{
         Enabled: true,
         Providers: map[string]oauth2plugintypes.ProviderConfig{
           "google": {
             Enabled:      true,
-            ClientID:     os.Getenv(gobetterauthenv.EnvGoogleClientID),
-            ClientSecret: os.Getenv(gobetterauthenv.EnvGoogleClientSecret),
+            ClientID:     os.Getenv(authulaenv.EnvGoogleClientID),
+            ClientSecret: os.Getenv(authulaenv.EnvGoogleClientSecret),
             RedirectURL:  fmt.Sprintf("%s%s/oauth2/callback/google", config.BaseURL, config.BasePath),
           },
         },
       }),
-    ],
+    },
   })
 }
 ```
@@ -93,10 +94,10 @@ func main() {
 
 ### Test the integration
 
-1. Start your GoBetterAuth server.
+1. Start your Authula server.
 1. In your webapp, create a button when clicked on, it navigates the user to:
    ```bash
-   # (replace localhost with your GoBetterAuth server URL in production).
+   # (replace localhost with your Authula server URL in production).
    http://localhost:8080/auth/oauth2/authorize/google?redirect_to=<YOUR_REDIRECT_URL>
    ```
 1. You should be redirected to Google's authorization page. After authorizing, you will be redirected back to your application.

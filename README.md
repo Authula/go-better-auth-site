@@ -1,9 +1,9 @@
 <p align="center">
-  <img src="./project-logo.png" alt="GoBetterAuth Logo" width="150"/>
+  <img src="./project-logo.png" alt="Authula Logo" width="200"/>
 </p>
 
 <p align="center">
-All-in-one landing page and docs site for the GoBetterAuth library.
+All-in-one landing page and docs site for Authula.
 </p>
 
 ---

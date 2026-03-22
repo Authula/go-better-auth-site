@@ -3,7 +3,7 @@ title: OAuth2 Plugin
 description: Enable OAuth2 authentication for your applications with ease.
 ---
 
-The OAuth2 plugin for GoBetterAuth allows you to integrate third-party OAuth2 providers into your authentication flow, enabling users to sign in using their accounts from popular services like Google, GitHub, and Discord.
+The OAuth2 plugin for Authula allows you to integrate third-party OAuth2 providers into your authentication flow, enabling users to sign in using their accounts from popular services like Google, GitHub, and Discord.
 
 ## What is OAuth2?
 
@@ -17,7 +17,7 @@ To use the plugin, you configure the desired providers with their client credent
 
 ## Supported Providers
 
-GoBetterAuth's OAuth2 plugin currently supports the following providers:
+Authula's OAuth2 plugin currently supports the following providers:
 
 - **[Discord](discord.mdx)**: Enable sign-in with Discord accounts.
 - **[GitHub](github.mdx)**: Allow users to authenticate using their GitHub credentials.
@@ -45,7 +45,7 @@ scopes = []
 
 ## Library Mode
 
-The plugin is configured by adding it to your GoBetterAuth instance with the desired providers. Here's a basic example:
+The plugin is configured by adding it to your Authula instance with the desired providers. Here's a basic example:
 
 ```go
 oauth2plugin.New(oauth2plugintypes.OAuth2PluginConfig{

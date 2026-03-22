@@ -29,16 +29,17 @@ Embed the plugin in your Go application:
 
 ```go
 import (
-  gobetterauth "github.com/GoBetterAuth/go-better-auth/v2"
-  gobetterauthconfig "github.com/GoBetterAuth/go-better-auth/v2/config"
-  magiclinkplugin "github.com/GoBetterAuth/go-better-auth/v2/plugins/magic-link"
-  magiclinkplugintypes "github.com/GoBetterAuth/go-better-auth/v2/plugins/magic-link/types"
+  authula "github.com/Authula/authula"
+  authulaconfig "github.com/Authula/authula/config"
+  authulamodels "github.com/Authula/authula/models"
+  magiclinkplugin "github.com/Authula/authula/plugins/magic-link"
+  magiclinkplugintypes "github.com/Authula/authula/plugins/magic-link/types"
 )
 
-config := gobetterauthconfig.NewConfig(/*...*/)
-auth := gobetterauth.New(gobetterauth.AuthConfig{
+config := authulaconfig.NewConfig(/*...*/)
+auth := authula.New(authula.AuthConfig{
   Config: config,
-  Plugins: []gobetterauthmodels.Plugin{
+  Plugins: []authulamodels.Plugin{
     magiclinkplugin.New(magiclinkplugintypes.MagicLinkPluginConfig{
       Enabled: true,
       ExpiresIn: 15 * time.Minute,
@@ -101,13 +102,13 @@ Exchanges the verified token for user session and authentication.
 
 ## Client Plugin
 
-If you're using the [GoBetterAuth SDK](https://github.com/GoBetterAuth/go-better-auth-node-sdk). Add the plugin to the SDK like so:
+If you're using the [Authula SDK](https://github.com/Authula/authula-node-sdk). Add the plugin to the SDK like so:
 
 ```typescript
-import { createClient } from "go-better-auth";
-import { MagicLinkPlugin } from "go-better-auth/plugins";
+import { createClient } from "authula";
+import { MagicLinkPlugin } from "authula/plugins";
 
-export const goBetterAuthClient = createClient({
+export const authulaClient = createClient({
   url: "http://localhost:8080/auth",
   plugins: [
     // other plugins...

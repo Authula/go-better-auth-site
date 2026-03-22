@@ -5,7 +5,7 @@ description: Extend the capabilities of the TypeScript SDK with client-side plug
 
 ## Overview
 
-GoBetterAuth provides a flexible plugin architecture that allows developers to extend the functionality of the TypeScript SDK with custom authentication flows, middleware, and utilities. The plugin system enables you to enhance the client-side authentication experience without modifying the core SDK.
+Authula provides a flexible plugin architecture that allows developers to extend the functionality of the TypeScript SDK with custom authentication flows, middleware, and utilities. The plugin system enables you to enhance the client-side authentication experience without modifying the core SDK.
 
 ## How the Plugin System Works
 
@@ -33,7 +33,7 @@ Every plugin must implement the `Plugin` interface:
 ```typescript
 export interface Plugin {
   readonly id: string;
-  init(client: GoBetterAuthClient): any;
+  init(client: AuthulaClient): any;
 }
 ```
 
@@ -45,12 +45,12 @@ export interface Plugin {
 Here's the basic structure of a custom plugin:
 
 ```typescript
-import type { GoBetterAuthClient, Plugin } from "go-better-auth";
+import type { AuthulaClient, Plugin } from "authula";
 
 class MyCustomPlugin implements Plugin {
   public readonly id = "myCustom"; // This becomes client.myCustom
 
-  public init(client: GoBetterAuthClient) {
+  public init(client: AuthulaClient) {
     // Register hooks and return public API
     return {
       // Public methods that will be available on client.myCustom
@@ -98,27 +98,27 @@ client.registerAfterFetch(async (ctx: FetchContext, res: Response) => {
 
 ### Email/Password
 
-The EmailPassword plugin provides convenience methods to make requests to the API endpoints on the GoBetterAuth server. View the [Source Code](https://github.com/GoBetterAuth/go-better-auth-node-sdk/blob/main/src/plugins/email-password/).
+The EmailPassword plugin provides convenience methods to make requests to the API endpoints on the Authula server. View the [Source Code](https://github.com/Authula/authula-node-sdk/blob/main/src/plugins/email-password/).
 
 ### OAuth2
 
-The OAuth2 plugin provides convenience methods to make requests to the API endpoints on the GoBetterAuth server. View the [Source Code](https://github.com/GoBetterAuth/go-better-auth-node-sdk/blob/main/src/plugins/oauth2/).
+The OAuth2 plugin provides convenience methods to make requests to the API endpoints on the Authula server. View the [Source Code](https://github.com/Authula/authula-node-sdk/blob/main/src/plugins/oauth2/).
 
 ### CSRF
 
-The CSRF plugin automatically handles CSRF tokens for mutating requests. View the [Source Code](https://github.com/GoBetterAuth/go-better-auth-node-sdk/blob/main/src/plugins/csrf/).
+The CSRF plugin automatically handles CSRF tokens for mutating requests. View the [Source Code](https://github.com/Authula/authula-node-sdk/blob/main/src/plugins/csrf/).
 
 ### JWT
 
-The JWT plugin provides convenience methods to make requests to the API endpoints on the GoBetterAuth server. View the [Source Code](https://github.com/GoBetterAuth/go-better-auth-node-sdk/blob/main/src/plugins/jwt/).
+The JWT plugin provides convenience methods to make requests to the API endpoints on the Authula server. View the [Source Code](https://github.com/Authula/authula-node-sdk/blob/main/src/plugins/jwt/).
 
 ### Bearer
 
-The Bearer plugin automatically adds authorization headers and handles token refresh. View the [Source Code](https://github.com/GoBetterAuth/go-better-auth-node-sdk/blob/main/src/plugins/bearer/).
+The Bearer plugin automatically adds authorization headers and handles token refresh. View the [Source Code](https://github.com/Authula/authula-node-sdk/blob/main/src/plugins/bearer/).
 
 ### Magic Link
 
-The Magic Link plugin provides convenience methods to handle magic link authentication flows. View the [Source Code](https://github.com/GoBetterAuth/go-better-auth-node-sdk/blob/main/src/plugins/magic-link/).
+The Magic Link plugin provides convenience methods to handle magic link authentication flows. View the [Source Code](https://github.com/Authula/authula-node-sdk/blob/main/src/plugins/magic-link/).
 
 ## Available Capabilities
 
@@ -158,12 +158,8 @@ if (client.config.cookies) {
 To use plugins, pass them when creating a client instance:
 
 ```typescript
-import { createClient } from "go-better-auth";
-import {
-  EmailPasswordPlugin,
-  BearerPlugin,
-  CSRFPlugin,
-} from "go-better-auth/plugins";
+import { createClient } from "authula";
+import { EmailPasswordPlugin, BearerPlugin, CSRFPlugin } from "authula/plugins";
 
 const client = createClient({
   url: "http://localhost:8080/auth",
@@ -273,7 +269,7 @@ If your plugin creates resources that need cleanup, consider providing a destroy
 Register hooks conditionally based on configuration:
 
 ```typescript
-public init(client: GoBetterAuthClient) {
+public init(client: AuthulaClient) {
   if (this.options.enableLogging) {
     client.registerBeforeFetch(logRequest);
     client.registerAfterFetch(logResponse);
@@ -306,6 +302,6 @@ const client = createClient({
 
 ## Conclusion
 
-The GoBetterAuth plugin system provides a powerful and flexible way to extend the client-side authentication SDK. By implementing the Plugin interface and leveraging the hook system, you can customize authentication flows, add security features, implement caching strategies, and much more.
+The Authula plugin system provides a powerful and flexible way to extend the client-side authentication SDK. By implementing the Plugin interface and leveraging the hook system, you can customize authentication flows, add security features, implement caching strategies, and much more.
 
 The architecture is designed to be modular, type-safe, and compatible with both client-side and server-side rendering environments, making it suitable for a wide range of applications and use cases.

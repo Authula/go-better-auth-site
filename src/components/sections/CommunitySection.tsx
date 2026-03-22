@@ -34,7 +34,7 @@ export default function CommunitySection() {
             </h2>
 
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
-              GoBetterAuth is seeking community collaboration and open-source
+              Authula is seeking community collaboration and open-source
               contributions. Your involvement—sharing code, offering feedback,
               and support will help shape the future of authentication. Join us
               on this journey to build the most flexible, configurable, and more

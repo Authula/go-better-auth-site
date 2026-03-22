@@ -2,7 +2,7 @@
 title: CSRF Plugin
 ---
 
-The CSRF plugin provides server-side protection against Cross-Site Request Forgery attacks using the Double-Submit Cookie pattern integrated into go-better-auth's lifecycle hook system.
+The CSRF plugin provides server-side protection against Cross-Site Request Forgery attacks using the Double-Submit Cookie pattern integrated into Authula's lifecycle hook system.
 
 ## Core Functionality
 
@@ -20,7 +20,7 @@ When users sign out, the plugin automatically clears the CSRF cookie.
 
 ## Integration Architecture
 
-The plugin integrates with go-better-auth through the **lifecycle hook system**, registering handlers at specific stages:
+The plugin integrates with Authula through the **lifecycle hook system**, registering handlers at specific stages:
 
 - **Before Hook (Order 5)**: Token generation for safe methods
 - **Before Hook (Order 15)**: Token validation for unsafe methods (requires explicit opt-in via route metadata)
@@ -39,8 +39,8 @@ Configure the CSRF plugin in your TOML configuration file:
 ```toml
 [plugins.csrf]
 enabled = true
-cookie_name = "gobetterauth_csrf_token"
-header_name = "X-GOBETTERAUTH-CSRF-TOKEN"
+cookie_name = "authula_csrf_token"
+header_name = "X-AUTHULA-CSRF-TOKEN"
 max_age = "24h"
 secure = true
 same_site = "lax"
@@ -49,25 +49,25 @@ enable_header_protection = false
 
 ### Configuration Options
 
-| Option                     | Type     | Default                       | Description                                    |
-| -------------------------- | -------- | ----------------------------- | ---------------------------------------------- |
-| `enabled`                  | boolean  | `true`                        | Enable or disable the plugin                   |
-| `cookie_name`              | string   | `"gobetterauth_csrf_token"`   | Name of the CSRF cookie                        |
-| `header_name`              | string   | `"X-GOBETTERAUTH-CSRF-TOKEN"` | Name of the CSRF header                        |
-| `max_age`                  | duration | `"24h"`                       | Token lifetime before expiration               |
-| `secure`                   | boolean  | `false`                       | Force Secure flag on cookies                   |
-| `same_site`                | string   | `"lax"`                       | SameSite attribute: `lax`, `strict`, or `none` |
-| `enable_header_protection` | boolean  | `false`                       | Enable Go's CrossOriginProtection              |
+| Option                     | Type     | Default                  | Description                                    |
+| -------------------------- | -------- | ------------------------ | ---------------------------------------------- |
+| `enabled`                  | boolean  | `true`                   | Enable or disable the plugin                   |
+| `cookie_name`              | string   | `"authula_csrf_token"`   | Name of the CSRF cookie                        |
+| `header_name`              | string   | `"X-AUTHULA-CSRF-TOKEN"` | Name of the CSRF header                        |
+| `max_age`                  | duration | `"24h"`                  | Token lifetime before expiration               |
+| `secure`                   | boolean  | `false`                  | Force Secure flag on cookies                   |
+| `same_site`                | string   | `"lax"`                  | SameSite attribute: `lax`, `strict`, or `none` |
+| `enable_header_protection` | boolean  | `false`                  | Enable Go's CrossOriginProtection              |
 
 ## Library Mode
 
-To use the plugin programmatically, instantiate it as part of the plugins array when creating a new GoBetterAuth instance:
+To use the plugin programmatically, instantiate it as part of the plugins array when creating a new Authula instance:
 
 ```go
 csrfplugin.New(csrfplugin.CSRFPluginConfig{
   Enabled:  true,
-  CookieName: "gobetterauth_csrf_token",
-  HeaderName: "X-GOBETTERAUTH-CSRF-TOKEN",
+  CookieName: "authula_csrf_token",
+  HeaderName: "X-AUTHULA-CSRF-TOKEN",
   MaxAge: time.Hour * 24,
   Secure:   false,
   SameSite: "lax",

@@ -1,17 +1,17 @@
 ---
 title: Adapters
-description: Integrate with popular Go HTTP routers and frameworks using GoBetterAuth's adapters.
+description: Integrate with popular Go HTTP routers and frameworks using Authula's adapters.
 ---
 
 # Overview
 
-GoBetterAuth provides adapters for some popular Go HTTP routers and frameworks, allowing you to easily integrate authentication into your applications. These adapters are designed to work seamlessly with the GoBetterAuth handler, making it easy to mount the authentication routes on your preferred router or framework. Some have adapters and others can be used directly with the handler without needing an adapter.
+Authula provides adapters for some popular Go HTTP routers and frameworks, allowing you to easily integrate authentication into your applications. These adapters are designed to work seamlessly with the Authula handler, making it easy to mount the authentication routes on your preferred router or framework. Some have adapters and others can be used directly with the handler without needing an adapter.
 
-> **Note:** When using adapters, any custom routes you create outside the GoBetterAuth handler won't have access to the GoBetterAuth hooks system. To make use of hooks on your custom routes, use the method `auth.RegisterCustomRoute()`.
+> **Note:** When using adapters, any custom routes you create outside the Authula handler won't have access to the Authula hooks system. To make use of hooks on your custom routes, use the method `auth.RegisterCustomRoute()`.
 
 ## Standard Library (net/http)
 
-The following example shows how to use the GoBetterAuth handler with the standard library's `net/http` package. This doesn't require an adapter and can be used directly with the handler provided by GoBetterAuth.
+The following example shows how to use the Authula handler with the standard library's `net/http` package. This doesn't require an adapter and can be used directly with the handler provided by Authula.
 
 ```go
 package main
@@ -20,16 +20,16 @@ import (
 	"log"
 	"net/http"
 
-	gobetterauth "github.com/GoBetterAuth/go-better-auth/v2"
-	gobetterauthconfig "github.com/GoBetterAuth/go-better-auth/v2/config"
-	gobetterauthmodels "github.com/GoBetterAuth/go-better-auth/v2/models"
+	authula "github.com/Authula/authula"
+	authulaconfig "github.com/Authula/authula/config"
+	authulamodels "github.com/Authula/authula/models"
 )
 
 func main() {
-	config := gobetterauthconfig.NewConfig(/*...*/)
-	auth := gobetterauth.New(&gobetterauth.AuthConfig{
+	config := authulaconfig.NewConfig(/*...*/)
+	auth := authula.New(&authula.AuthConfig{
 		Config:  config,
-		Plugins: []gobetterauth.Plugin{},
+		Plugins: []authulamodels.Plugin{},
 	})
 
 	// Mount handler
@@ -44,7 +44,7 @@ func main() {
 
 ## Chi
 
-GoBetterAuth already uses Chi under the hood. The following example shows how to add more routes to GoBetterAuth. This doesn't require an adapter and can be used directly with the handler provided by GoBetterAuth.
+Authula already uses Chi under the hood. The following example shows how to add more routes to Authula. This doesn't require an adapter and can be used directly with the handler provided by Authula.
 
 ```go
 package main
@@ -53,26 +53,26 @@ import (
 	"log"
 	"net/http"
 
-	gobetterauth "github.com/GoBetterAuth/go-better-auth/v2"
-	gobetterauthconfig "github.com/GoBetterAuth/go-better-auth/v2/config"
-	gobetterauthmodels "github.com/GoBetterAuth/go-better-auth/v2/models"
+	authula "github.com/Authula/authula"
+	authulaconfig "github.com/Authula/authula/config"
+	authulamodels "github.com/Authula/authula/models"
 )
 
 func main() {
-	config := gobetterauthconfig.NewConfig(/*...*/)
-	auth := gobetterauth.New(&gobetterauth.AuthConfig{
+	config := authulaconfig.NewConfig(/*...*/)
+	auth := authula.New(&authula.AuthConfig{
 		Config:  config,
-		Plugins: []gobetterauth.Plugin{},
+		Plugins: []authulamodels.Plugin{},
 	})
 
 	// Add a custom route. This will be added outside of auth routes such as /api/auth
 	// allowing you to define your own custom routes.
-	auth.RegisterCustomRoute(gobetterauthmodels.Route{
+	auth.RegisterCustomRoute(authulamodels.Route{
 		Method:   "GET",
 		Path:     "/api/health",
 		Metadata: map[string]any{},
 		Handler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			reqCtx, _ := gobetterauthmodels.GetRequestContext(r.Context())
+			reqCtx, _ := authulamodels.GetRequestContext(r.Context())
 			reqCtx.SetJSONResponse(http.StatusOK, map[string]any{
 				"status": "ok",
 			})
@@ -87,7 +87,7 @@ func main() {
 
 ## Echo
 
-The following example shows how to use Echo to mount the GoBetterAuth handler. This allows you to easily integrate GoBetterAuth into your Echo-based applications and doesn't require an adapter since the handler can be used directly.
+The following example shows how to use Echo to mount the Authula handler. This allows you to easily integrate Authula into your Echo-based applications and doesn't require an adapter since the handler can be used directly.
 
 ```go
 package main
@@ -98,16 +98,16 @@ import (
 
 	"github.com/labstack/echo/v4"
 
-	gobetterauth "github.com/GoBetterAuth/go-better-auth/v2"
-	gobetterauthconfig "github.com/GoBetterAuth/go-better-auth/v2/config"
-	gobetterauthmodels "github.com/GoBetterAuth/go-better-auth/v2/models"
+	authula "github.com/Authula/authula"
+	authulaconfig "github.com/Authula/authula/config"
+	authulamodels "github.com/Authula/authula/models"
 )
 
 func main() {
-	config := gobetterauthconfig.NewConfig(/*...*/)
-	auth := gobetterauth.New(&gobetterauth.AuthConfig{
+	config := authulaconfig.NewConfig(/*...*/)
+	auth := authula.New(&authula.AuthConfig{
 		Config:  config,
-		Plugins: []gobetterauth.Plugin{},
+		Plugins: []authulamodels.Plugin{},
 	})
 
 	echoInstance := echo.New()
@@ -123,7 +123,7 @@ func main() {
 
 ## Fiber
 
-The following example shows how to use the official Fiber adapter to mount the GoBetterAuth handler on a Fiber application.
+The following example shows how to use the official Fiber adapter to mount the Authula handler on a Fiber application.
 
 ```go
 package main
@@ -133,22 +133,22 @@ import (
 
 	"github.com/gofiber/fiber/v3"
 
-	gobetterauth "github.com/GoBetterAuth/go-better-auth/v2"
-	gobetterauthconfig "github.com/GoBetterAuth/go-better-auth/v2/config"
-	gobetterauthmodels "github.com/GoBetterAuth/go-better-auth/v2/models"
-	fiberadapter "github.com/GoBetterAuth/go-better-auth/v2/adapters/fiber"
+	authula "github.com/Authula/authula"
+	authulaconfig "github.com/Authula/authula/config"
+	authulamodels "github.com/Authula/authula/models"
+	fiberadapter "github.com/Authula/authula/adapters/fiber"
 )
 
 func main() {
-	config := gobetterauthconfig.NewConfig(/*...*/)
-	auth := gobetterauth.New(&gobetterauth.AuthConfig{
+	config := authulaconfig.NewConfig(/*...*/)
+	auth := authula.New(&authula.AuthConfig{
 		Config:  config,
-		Plugins: []gobetterauth.Plugin{},
+		Plugins: []authulamodels.Plugin{},
 	})
 
 	app := fiber.New()
 
-	// Mount GoBetterAuth handler using the Fiber adapter
+	// Mount Authula handler using the Fiber adapter
 	app.Use("/api/auth", fiberadapter.New(fiberadapter.Config{
 		Handler: auth.Handler(),
 	}))

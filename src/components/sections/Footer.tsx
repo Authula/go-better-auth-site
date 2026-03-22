@@ -42,7 +42,7 @@ export default function Footer() {
           <div className="flex items-center gap-3">
             <Image
               src="/app-logo.png"
-              alt="GoBetterAuth Logo"
+              alt="Authula Logo"
               width={50}
               height={50}
             />
@@ -66,7 +66,7 @@ export default function Footer() {
         <hr className="mt-4 mb-2 border-t border-dashed border-sky-950" />
 
         <p className="text-sm text-center py-4">
-          &copy; {new Date().getFullYear()} GoBetterAuth | All rights reserved.
+          &copy; {new Date().getFullYear()} Authula | All rights reserved.
         </p>
       </div>
     </footer>

@@ -36,28 +36,28 @@ cleanup_interval = "1m"
 
 ## Library Mode
 
-To use the plugin programmatically, instantiate and register it in your GoBetterAuth instance. Note that the secondary storage plugin must be registered before the rate-limit plugin to enable distributed rate limiting.
+To use the plugin programmatically, instantiate and register it in your Authula instance. Note that the secondary storage plugin must be registered before the rate-limit plugin to enable distributed rate limiting.
 
 ```go
 import (
   "os"
 
-  gobetterauth "github.com/GoBetterAuth/go-better-auth/v2"
-  gobetterauthenv "github.com/GoBetterAuth/go-better-auth/v2/env"
-  gobetterauthmodels "github.com/GoBetterAuth/go-better-auth/v2/models"
-  secondarystorageplugin "github.com/GoBetterAuth/go-better-auth/v2/plugins/secondary-storage"
+  authula "github.com/Authula/authula"
+  authulaenv "github.com/Authula/authula/env"
+  authulamodels "github.com/Authula/authula/models"
+  secondarystorageplugin "github.com/Authula/authula/plugins/secondary-storage"
 )
 
-goBetterAuth := gobetterauth.New(&gobetterauth.AuthConfig{
+auth := authula.New(&authula.AuthConfig{
   Config: config,
-  Plugins: []gobetterauthmodels.Plugin{
+  Plugins: []authulamodels.Plugin{
     // Secondary storage plugin MUST be registered before rate-limit plugin
     // This allows rate-limit to optionally use Redis/database for distributed rate limiting
     secondarystorageplugin.New(secondarystorageplugin.SecondaryStoragePluginConfig{
       Enabled:  true,
       Provider: secondarystorageplugin.SecondaryStorageProviderRedis,
       Redis: &secondarystorageplugin.RedisStorageConfig{
-        URL: os.Getenv(gobetterauthenv.EnvRedisURL),
+        URL: os.Getenv(authulaenv.EnvRedisURL),
       },
     }),
   },

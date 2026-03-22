@@ -2,7 +2,7 @@
 title: Config Manager Plugin
 ---
 
-The Config Manager plugin enables dynamic configuration management for GoBetterAuth. It allows storing, updating, and retrieving app settings from a database in real-time, with encryption for sensitive data.
+The Config Manager plugin enables dynamic configuration management for Authula. It allows storing, updating, and retrieving app settings from a database in real-time, with encryption for sensitive data.
 
 ## Features
 
@@ -29,10 +29,19 @@ enabled = true
 Instantiate the plugin in your Go code:
 
 ```go
-gobetterauth.New(&gobetterauth.AuthConfig{
+import (
+  authula "github.com/Authula/authula"
+  authulaconfig "github.com/Authula/authula/config"
+  authulamodels "github.com/Authula/authula/models"
+  configmanagerplugin "github.com/Authula/authula/plugins/config-manager"
+  configmanagerplugintypes "github.com/Authula/authula/plugins/config-manager/types"
+)
+
+config := authulaconfig.NewConfig(/* ... */)
+authula.New(&authula.AuthConfig{
   Config: config,
-  Plugins: []gobetterauthmodels.Plugin{
-    configmanagerplugin.New(types.ConfigManagerPluginConfig{
+  Plugins: []authulamodels.Plugin{
+    configmanagerplugin.New(configmanagerplugintypes.ConfigManagerPluginConfig{
   		Enabled: true,
   	}),
   },

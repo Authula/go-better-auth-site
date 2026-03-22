@@ -1,10 +1,10 @@
 {
-  "name": "go-better-auth-site",
+  "name": "authula-site",
   "build": {
     "context": ".",
     "dockerfile": "Dockerfile"
   },
-  "workspaceFolder": "/workspaces/go-better-auth-site",
+  "workspaceFolder": "/workspaces/authula-site",
   "forwardPorts": [3000],
   "customizations": {
     "vscode": {
@@ -18,9 +18,8 @@
         "editor.tabSize": 2,
         "editor.formatOnSave": true,
         "files.insertFinalNewline": true,
-        "editor.defaultFormatter": "prettier.prettier-vscode",
-        "javascript.updateImportsOnFileMove.enabled": "always",
-        "typescript.updateImportsOnFileMove.enabled": "always",
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "js/ts.updateImportsOnFileMove.enabled": "always",
         "telemetry.telemetryLevel": "off",
         "editor.bracketPairColorization.enabled": true,
         "editor.guides.bracketPairs": "active"

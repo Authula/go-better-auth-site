@@ -2,7 +2,7 @@
 title: Event Driven Architecture
 ---
 
-A transport-agnostic, resilient event bus for GoBetterAuth built on Watermill. Supports 7 message brokers with automatic reconnection, concurrent handler execution, and graceful shutdown.
+A transport-agnostic, resilient event bus for Authula built on Watermill. Supports 7 message brokers with automatic reconnection, concurrent handler execution, and graceful shutdown.
 
 ## Architecture
 
@@ -31,11 +31,11 @@ Services interact with the EventBus to publish and subscribe to events. The Even
 
 ```go
 // Initialize provider (Redis example)
-config := gobetterauthconfig.WithEventBus(gobetterauthmodels.EventBusConfig{
-	Provider: gobetterauthevents.ProviderRedis.String(),
-	Redis: &gobetterauthmodels.RedisConfig{
-		URL: os.Getenv(gobetterauthenv.EnvRedisURL),
-		ConsumerGroup: os.Getenv(gobetterauthenv.EnvEventBusConsumerGroup),
+config := authulaconfig.WithEventBus(authulamodels.EventBusConfig{
+	Provider: authulaevents.ProviderRedis.String(),
+	Redis: &authulamodels.RedisConfig{
+		URL: os.Getenv(authulaenv.EnvRedisURL),
+		ConsumerGroup: os.Getenv(authulaenv.EnvEventBusConsumerGroup),
 	},
 })
 
@@ -74,11 +74,11 @@ EVENT_BUS_CONSUMER_GROUP="consumer_group"
 
 ```go
 // With explicit config
-gobetterauthconfig.WithEventBus(gobetterauthmodels.EventBusConfig{
-	Provider: gobetterauthevents.ProviderRedis.String(),
-	Redis: &gobetterauthmodels.RedisConfig{
-		URL:           os.Getenv(gobetterauthenv.EnvRedisURL),
-		ConsumerGroup: os.Getenv(gobetterauthenv.EnvEventBusConsumerGroup),
+authulaconfig.WithEventBus(authulamodels.EventBusConfig{
+	Provider: authulaevents.ProviderRedis.String(),
+	Redis: &authulamodels.RedisConfig{
+		URL:           os.Getenv(authulaenv.EnvRedisURL),
+		ConsumerGroup: os.Getenv(authulaenv.EnvEventBusConsumerGroup),
 	},
 })
 ```
