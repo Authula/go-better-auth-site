@@ -3,37 +3,36 @@ title: OAuth2 Plugin
 description: Enable OAuth2 authentication for your applications with ease.
 ---
 
+## Overview
+
 The OAuth2 plugin for Authula allows you to integrate third-party OAuth2 providers into your authentication flow, enabling users to sign in using their accounts from popular services like Google, GitHub, and Discord.
 
-## What is OAuth2?
+### Features
 
-OAuth2 is an open standard for access delegation, commonly used as a way for Internet users to grant websites or applications access to their information on other websites but without giving them the passwords. It's widely used for authentication, allowing users to log in to your application using their existing accounts from OAuth2-enabled providers.
+- **Third-Party Authentication** — Allow users to authenticate using existing accounts from OAuth2-enabled providers
+- **Multiple Provider Support** — Configure and enable multiple OAuth2 providers simultaneously (Google, GitHub, Discord)
+- **Automatic Token Management** — Handles authorization requests, token exchanges, and user profile retrieval
+- **Security Best Practices** — Built-in support for secure credential management via environment variables
 
-## How It Works
+### Supported Providers
 
-The OAuth2 plugin simplifies the integration by handling the OAuth2 flow on behalf of your application. It manages authorization requests, token exchanges, and user profile retrieval, while ensuring security best practices are followed.
-
-To use the plugin, you configure the desired providers with their client credentials and redirect URLs. The plugin then exposes endpoints for initiating OAuth2 flows and handling callbacks.
-
-## Supported Providers
-
-Authula's OAuth2 plugin currently supports the following providers:
-
-- **[Discord](discord.mdx)**: Enable sign-in with Discord accounts.
-- **[GitHub](github.mdx)**: Allow users to authenticate using their GitHub credentials.
-- **[Google](google.mdx)**: Integrate Google OAuth2 for seamless user authentication.
+- **[Discord](discord.mdx)** — Enable sign-in with Discord accounts
+- **[GitHub](github.mdx)** — Allow users to authenticate using their GitHub credentials
+- **[Google](google.mdx)** — Integrate Google OAuth2 for seamless user authentication
 
 Each provider guide includes step-by-step instructions for obtaining credentials, configuring the provider, and testing the integration.
 
-## Standalone Mode
+---
 
-Configure the plugin in your `config.toml`:
+## Configuration
+
+`Standalone Mode:`
 
 ```toml
 [plugins.oauth2]
 enabled = true
 
-# SECURITY NOTE: It is recommended to set the 'client_secret' for each of these via their
+# SECURITY NOTE: It is recommended to set the 'client_secret' for each provider via their
 # respective environment variables as shown in the .env.example file rather than hardcoding it here.
 [plugins.oauth2.providers.google]
 enabled = true
@@ -43,11 +42,14 @@ redirect_url = "http://localhost:8080/auth/oauth2/callback/google"
 scopes = []
 ```
 
-## Library Mode
-
-The plugin is configured by adding it to your Authula instance with the desired providers. Here's a basic example:
+`Library Mode:`
 
 ```go
+import (
+  oauth2plugin "github.com/Authula/authula/plugins/oauth2"
+  oauth2plugintypes "github.com/Authula/authula/plugins/oauth2/types"
+)
+
 oauth2plugin.New(oauth2plugintypes.OAuth2PluginConfig{
   Enabled: true,
   Providers: map[string]oauth2plugintypes.ProviderConfig{
@@ -55,13 +57,40 @@ oauth2plugin.New(oauth2plugintypes.OAuth2PluginConfig{
       Enabled:      true,
       ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
       ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
-      RedirectURL:  "https://yourdomain.com/api/auth/oauth2/callback/google",
+      RedirectURL:  "https://yourdomain.com/auth/oauth2/callback/google",
     },
   },
 })
 ```
 
-For detailed configuration options and provider-specific settings, refer to the individual provider documentation.
+---
+
+## API Reference
+
+| HTTP Method | Route Path                     | Description                               |
+| ----------- | ------------------------------ | ----------------------------------------- |
+| `GET`       | `/oauth2/authorize/{provider}` | Initiate OAuth2 authorization flow        |
+| `GET`       | `/oauth2/callback/{provider}`  | Handle OAuth2 callback and token exchange |
+
+---
+
+## Database Schema
+
+This plugin doesn't create any database tables.
+
+---
+
+## Plugin Capabilities
+
+This plugin doesn't have any hooks and capabilities.
+
+---
+
+## Security Recommendations
+
+- **Use Environment Variables for Secrets** — Never hardcode `client_secret` values in your TOML configuration. Use environment variables as shown in the `.env.example` file.
+- **Secure Redirect URLs** — Ensure redirect URLs use HTTPS in production to prevent token interception.
+- **Validate Provider Scopes** — Only request the minimum scopes necessary for your application to reduce security exposure.
 
 ---
 
