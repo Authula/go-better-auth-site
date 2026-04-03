@@ -1,20 +1,27 @@
 ---
-title: Ratelimit Plugin
+title: Rate Limit Plugin
+description: Provide request rate limiting with multiple storage backends and per-endpoint custom rules.
 ---
 
-The Rate Limit Plugin provides request rate limiting with multiple storage backends and per-endpoint custom rules.
+## Overview
 
-## Features
+The Rate Limit plugin provides request rate limiting with multiple storage backends and per-endpoint custom rules to protect your application from abuse and brute force attacks.
 
-- **Multiple Storage Backends**: In-memory (default), Redis, or Database storage
-- **Custom Rules Per Endpoint**: Different limits for different paths or methods
-- **Client IP-Based Limiting**: Tracks requests by client IP address
-- **Standard HTTP Rate Limit Headers**: Client-aware headers for rate limit information
-- **Automatic Cleanup**: Removes expired entries to prevent memory leaks
-- **Fail-Open Behavior**: Allows requests when storage provider errors occur
-- **Production Auto-Enable**: Automatically enabled when `GO_ENVIRONMENT=production`
+### Features
 
-## Standalone Mode
+- **Multiple Storage Backends** — In-memory (default), Redis, or Database storage
+- **Custom Rules Per Endpoint** — Different limits for different paths or methods
+- **Client IP-Based Limiting** — Tracks requests by client IP address
+- **Standard HTTP Rate Limit Headers** — Client-aware headers for rate limit information
+- **Automatic Cleanup** — Removes expired entries to prevent memory leaks
+- **Fail-Open Behavior** — Allows requests when storage provider errors occur
+- **Production Auto-Enable** — Automatically enabled when `GO_ENVIRONMENT=production`
+
+---
+
+## Configuration
+
+`Standalone Mode:`
 
 ```toml
 [plugins.ratelimit]
@@ -34,116 +41,65 @@ cleanup_interval = "1m"    # How often to clean expired entries (default: 1 minu
 
 # Custom rules for specific endpoints
 [plugins.ratelimit.custom_rules]
-"/api/login" = { window = "5m", max = 5 }     # Stricter limits for login
-"/api/public" = { disabled = true }            # Disable rate limiting for public endpoints
+"/some/path" = { window = "5m", max = 5 }     # Stricter limits
+"/some/other/path" = { disabled = true }            # Disable rate limiting for this path
 ```
 
-## Library Mode
-
-To use the plugin programmatically, instantiate it as part of the plugins array when creating a new Authula instance:
+`Library Mode:`
 
 ```go
-ratelimitplugin.New(ratelimitplugin.RateLimitPluginConfig{
-	Enabled:  true,
-	Provider: ratelimitplugin.RateLimitProviderRedis,
-	Window:   time.Minute,
-	Max:      100,
-	Prefix:   "ratelimit:",
-	CustomRules: map[string]ratelimitplugin.RateLimitRule{
-		"/api/health": {
-			Disabled: true,
-		},
-	},
+import (
+  ratelimitplugin "github.com/Authula/authula/plugins/ratelimit"
+  ratelimitplugintypes "github.com/Authula/authula/plugins/ratelimit/types"
+)
+
+ratelimitplugin.New(ratelimitplugintypes.RateLimitPluginConfig{
+  Enabled:  true,
+  Provider: ratelimitplugin.RateLimitProviderRedis,
+  Window:   time.Minute,
+  Max:      100,
+  Prefix:   "ratelimit:",
+  CustomRules: map[string]ratelimitplugintypes.RateLimitRule{
+    "/some/path": {
+      Disabled: true,
+    },
+  },
 })
 ```
 
-## Available Hooks
-
-| Hook ID          | Stage     | Purpose                                                            |
-| ---------------- | --------- | ------------------------------------------------------------------ |
-| _(auto-applied)_ | OnRequest | Checks rate limits for all requests early in the request lifecycle |
+---
 
 ## Storage Providers
 
-### In-Memory (Default)
+| Provider     | Performance | Persistence | Best For                    |
+| ------------ | ----------- | ----------- | --------------------------- |
+| **Memory**   | Fastest     | No          | Single-instance deployments |
+| **Database** | Moderate    | Yes         | Strict audit requirements   |
+| **Redis**    | Fast        | Yes         | Multi-instance deployments  |
 
-- Fastest performance
-- Data lost on server restart
-- Automatic cleanup of expired entries
-- Best for single-instance deployments
+---
 
-### Redis
+## API Reference
 
-- Distributed across multiple instances
-- Requires Secondary Storage plugin with Redis provider
-- Falls back to in-memory if Redis unavailable
-- Best for multi-instance deployments
+The Rate Limit plugin does not expose its own HTTP endpoints. Instead, it applies rate limiting as a hook to all incoming requests.
 
-### Database
-
-- Persistent storage across restarts
-- Uses database migrations for schema
-- Automatic cleanup via background tasks
-- Best for strict audit requirements
-
-## Custom Rules
+### Custom Rules
 
 Override default rate limits for specific paths:
 
 ```toml
 [plugins.ratelimit.custom_rules]
 # Stricter rate limit for login attempts
-"/api/sign-in" = { window = "15m", max = 10 }
+"/auth/sign-in" = { window = "15m", max = 10 }
 
-# Different limits for password reset
-"/api/reset-password" = { window = "1h", max = 3 }
+# Different limits for specific endpoint
+"/some/path" = { window = "1h", max = 3 }
 
-# Disable rate limiting for health checks
-"/health" = { disabled = true }
-
-# Custom prefix for specific endpoint
-"/api/webhook" = { window = "1m", max = 1000, prefix = "webhook:" }
+# Disable rate limiting for specific endpoint
+"/some/path" = { disabled = true }
 ```
 
-## Rate Limit Flow
-
-```
-┌─────────────┐
-│   Request   │
-└──────┬──────┘
-       │
-       ▼
-┌─────────────┐
-│ Skip OPTIONS│────────No────▶┌─────────────┐
-│   Method?   │               │  Get Client │
-└─────────────┘               │     IP      │
-       │                      └──────┬──────┘
-      Yes                            │
-       │                             ▼
-       │                      ┌─────────────┐
-       │                      │  Get Custom │
-       │                      │    Rules    │
-       │                      └──────┬──────┘
-       │                             │
-       │                             ▼
-       │                      ┌─────────────┐
-       │                      │Check/Incr   │
-       │                      │   Provider  │
-       │                      └──────┬──────┘
-       │                             │
-       │                    ┌────────┴────────┐
-       │                    │                 │
-       │                 Allowed          Not Allowed
-       │                    │                 │
-       │                    ▼                 ▼
-       │              ┌─────────┐      ┌─────────────┐
-       │              │Continue │      │  429 Too    │
-       │              │Request  │      │Many Requests│
-       └──────────────│         │      └─────────────┘
-                      └─────────┘
-```
-
-## HTTP Headers
+### HTTP Response Headers
 
 The plugin adds standard rate limit headers to all responses:
 
@@ -153,14 +109,6 @@ The plugin adds standard rate limit headers to all responses:
 | `X-RateLimit-Remaining` | Remaining requests in current window                  |
 | `X-RateLimit-Reset`     | Unix timestamp when the window resets                 |
 | `X-Retry-After`         | Seconds to wait before retry (only when rate limited) |
-
-Example Response Headers:
-
-```
-X-RateLimit-Limit: 100
-X-RateLimit-Remaining: 95
-X-RateLimit-Reset: 1738302000
-```
 
 When rate limited:
 
@@ -179,25 +127,36 @@ X-Retry-After: 45
 }
 ```
 
-## Dependencies
+---
 
-- **Secondary Storage** (optional): Required for Redis provider
-- **Database** (optional): Required for Database provider with migrations
+## Database Schema
 
-## Security Considerations
+### Table: `rate_limits`
 
-- **Client IP Detection**: Uses client IP from the request. Configure `trusted_proxies` and `trusted_headers` in the global security config if behind a load balancer.
-- **Fail-Open**: Provider errors allow requests through to prevent denial-of-service from rate limiter failures.
-- **OPTIONS Requests**: Automatically skipped to prevent blocking CORS preflight requests.
+| Field        | Type      | Key | Description                      |
+| ------------ | --------- | --- | -------------------------------- |
+| `key`        | string    | PK  | Rate limit key (e.g., client IP) |
+| `count`      | int       | -   | Current request count            |
+| `expires_at` | timestamp | -   | When the entry expires           |
 
-## Best Practices
+- SQLite: this table is set as a temp table to ensure it is automatically cleared on server restart.
+- PostgreSQL: this table is set as an unlogged table to improve performance, with a periodic cleanup process to remove expired entries.
+- MYSQL: this table is set as a MEMORY table to store data in memory for fast access, with automatic cleanup of expired entries.
 
-1. **Stricter Limits for Auth Endpoints**: Apply lower limits to `/sign-in`, `/sign-up`, and password reset endpoints to prevent brute force attacks.
+Migrations are automatically handled when the plugin is initialized.
 
-2. **Higher Limits for Public APIs**: Disable or increase limits for public read-only endpoints.
+---
 
-3. **Use Redis for Multi-Instance**: When running multiple server instances, use Redis to share rate limit state across all instances.
+## Plugin Capabilities
 
-4. **Monitor Rate Limit Headers**: Client applications should check `X-RateLimit-Remaining` and back off when approaching limits.
+This plugin doesn't have any capabilities. However, it does have a global hook which is applied if the plugin is enabled and there are custom rules defined which applies rate limiting to specific endpoints.
 
-5. **Handle 429 Responses**: Clients should respect the `X-Retry-After` header and wait before retrying requests.
+---
+
+## Security Recommendations
+
+- **Client IP Detection** — Uses client IP from the request. Configure `trusted_proxies` and `trusted_headers` in the global security config if behind a load balancer.
+- **Fail-Open** — Provider errors allow requests through to prevent denial-of-service from rate limiter failures.
+- **OPTIONS Requests** — Automatically skipped to prevent blocking CORS preflight requests.
+- **Stricter Limits for Auth Endpoints** — Apply lower limits to sensitive endpoints on other plugins to prevent brute force attacks.
+- **Use Redis for Multi-Instance** — When running multiple server instances, use Redis to share rate limit state across all instances.
