@@ -7,19 +7,19 @@ description: A plugin for implementing TOTP-based two-factor authentication.
 
 The TOTP plugin provides Time-based One-Time Password (TOTP) authentication and backup codes for implementing two-factor authentication (2FA) in your application. This plugin enables users to secure their accounts with authenticator apps like Google Authenticator, Microsoft Authenticator, or Authy, along with backup codes for account recovery.
 
-### Key Features
+### Features
 
-- **TOTP Generation & Verification**: Supports standard TOTP algorithm with configurable digit count and period
-- **Backup Codes**: Automatically generate backup codes for account recovery
-- **Trusted Devices**: Option to trust devices to skip TOTP verification on subsequent logins
-- **Event Hooks**: Integration with the event bus for custom actions on TOTP events
-- **Configurable Settings**: Customizable expiry times, cookie settings, and security options
+- **TOTP Generation & Verification** — Supports standard TOTP algorithm with configurable digit count and period
+- **Backup Codes** — Automatically generate backup codes for account recovery
+- **Trusted Devices** — Option to trust devices to skip TOTP verification on subsequent logins
+- **Event Hooks** — Integration with the event bus for custom actions on TOTP events
+- **Configurable Settings** — Customizable expiry times, cookie settings, and security options
 
 ---
 
 ## Configuration
 
-### Standalone Mode
+`Standalone Mode:`
 
 ```toml
 [totp]
@@ -34,12 +34,12 @@ secure_cookie = true     # Use secure flag on cookies (set to true in production
 same_site = "lax"        # SameSite cookie policy (lax, strict, none)
 ```
 
-### Library Mode
+`Library Mode:`
 
 ```go
 import (
-	totpplugin "github.com/Authula/authula/plugins/totp"
-	totpplugintypes "github.com/Authula/authula/plugins/totp/types"
+  totpplugin "github.com/Authula/authula/plugins/totp"
+  totpplugintypes "github.com/Authula/authula/plugins/totp/types"
 )
 
 totpplugin.New(totpplugintypes.TOTPPluginConfig{
@@ -55,35 +55,33 @@ totpplugin.New(totpplugintypes.TOTPPluginConfig{
 })
 ```
 
-NOTE: make sure to set the `AppName` in your `config.toml` in standalone mode or in your AuthConfig in library mode, as it is used in the TOTP URI for authenticator apps.
+NOTE: Make sure to set the `AppName` in your `config.toml` in standalone mode or in your AuthConfig in library mode, as it is used in the TOTP URI for authenticator apps.
 
 ---
 
 ## API Reference
 
-| Route                              | Auth Required | Description                                                                                                   |
-| ---------------------------------- | :-----------: | :------------------------------------------------------------------------------------------------------------ |
-| `POST /totp/enable`                |    ✅ Yes     | Enable TOTP for authenticated user. Returns TOTP URI (QR code data) and backup codes.                         |
-| `POST /totp/disable`               |    ✅ Yes     | Disable TOTP authentication for authenticated user.                                                           |
-| `GET /totp/get-uri`                |    ✅ Yes     | Retrieve the TOTP URI for the authenticated user's current TOTP configuration.                                |
-| `POST /totp/verify`                |     ❌ No     | Verify TOTP code during login. Requires valid pending token cookie. User and session are returned on success. |
-| `POST /totp/verify-backup-code`    |     ❌ No     | Verify backup code during login. Requires valid pending token cookie. Single-use only.                        |
-| `POST /totp/generate-backup-codes` |    ✅ Yes     | Generate new backup codes for authenticated user. Invalidates previous codes.                                 |
+| HTTP Method | Route Path                    | Description                     |
+| ----------- | ----------------------------- | ------------------------------- |
+| `POST`      | `/totp/enable`                | Enable TOTP for user            |
+| `POST`      | `/totp/disable`               | Disable TOTP for user           |
+| `GET`       | `/totp/get-uri`               | Get TOTP URI                    |
+| `POST`      | `/totp/verify`                | Verify TOTP code during login   |
+| `POST`      | `/totp/verify-backup-code`    | Verify backup code during login |
+| `POST`      | `/totp/generate-backup-codes` | Generate new backup codes       |
 
 ### Authentication Notes
 
-- **✅ Yes**: Standard authentication required. User must be authenticated via session or other auth mechanism.
-- **❌ No**: Standard authentication NOT required, but special conditions apply. These routes require a valid TOTP pending token cookie set by the initial authentication attempt.
+- **Authenticated endpoints** (`enable`, `disable`, `get-uri`, `generate-backup-codes`): Standard authentication required. User must be authenticated via session or other auth mechanism.
+- **Pending-token endpoints** (`verify`, `verify-backup-code`): Standard authentication NOT required. These routes require a valid TOTP pending token cookie set by the initial authentication attempt.
 
 ### Endpoint Details
 
-POST /totp/enable:
-
-`Request`:
+`POST /totp/enable:`
 
 No request body required.
 
-`Response`:
+`Response:`
 
 ```json
 {
@@ -92,13 +90,11 @@ No request body required.
 }
 ```
 
-POST /totp/disable:
-
-`Request`:
+`POST /totp/disable:`
 
 No request body required.
 
-`Response`:
+`Response:`
 
 ```json
 {
@@ -106,9 +102,9 @@ No request body required.
 }
 ```
 
-GET /totp/get-uri:
+`GET /totp/get-uri:`
 
-`Response`:
+`Response:`
 
 ```json
 {
@@ -116,9 +112,9 @@ GET /totp/get-uri:
 }
 ```
 
-POST /totp/verify:
+`POST /totp/verify:`
 
-`Request`:
+`Request:`
 
 ```json
 {
@@ -130,7 +126,7 @@ POST /totp/verify:
 - `code`: (Required) The 6-digit TOTP code to verify
 - `trust_device`: (Optional) If true, marks the device as trusted to skip TOTP verification on future logins for the configured duration
 
-`Response`:
+`Response:`
 
 ```json
 {
@@ -143,9 +139,9 @@ POST /totp/verify:
 }
 ```
 
-POST /totp/verify-backup-code:
+`POST /totp/verify-backup-code:`
 
-`Request`:
+`Request:`
 
 ```json
 {
@@ -157,7 +153,7 @@ POST /totp/verify-backup-code:
 - `code`: (Required) The backup code to verify. Backup codes are single-use and will be invalidated after successful verification.
 - `trust_device`: (Optional) If true, marks the device as trusted to skip TOTP verification on future logins for the configured duration
 
-`Response`:
+`Response:`
 
 ```json
 {
@@ -170,13 +166,11 @@ POST /totp/verify-backup-code:
 }
 ```
 
-POST /totp/generate-backup-codes:
-
-`Request`:
+`POST /totp/generate-backup-codes:`
 
 No request body required.
 
-`Response`:
+`Response:`
 
 ```json
 {
@@ -188,9 +182,7 @@ No request body required.
 
 ## Database Schema
 
-This plugin creates the following database tables:
-
-Table: `totp`
+### Table: `totp`
 
 | Field          | Type      | Key | Description                           |
 | -------------- | --------- | --- | ------------------------------------- |
@@ -202,7 +194,7 @@ Table: `totp`
 | `created_at`   | timestamp | -   | Record creation time                  |
 | `updated_at`   | timestamp | -   | Record last update time               |
 
-Table: `trusted_devices`
+### Table: `trusted_devices`
 
 | Field        | Type      | Key | Description                              |
 | ------------ | --------- | --- | ---------------------------------------- |
@@ -217,35 +209,43 @@ Migrations are automatically handled when the plugin is initialized.
 
 ---
 
-## Event Hooks
+## Plugin Capabilities
 
-The TOTP plugin emits events for the following operations:
+This plugin has the following hooks and capabilities:
 
-- `totp.enabled`
-- `totp.disabled`
-- `totp.verified`
-- `totp.backup_code_used`
-- `totp.device_trusted`
-
-These events can be subscribed to via the event bus for logging, analytics, or custom business logic.
+- `totp.intercept` — Intercepts authentication flow by setting the user a pending token cookie and returning a simple JSON response indicating a TOTP redirection. The client can then check for this response and redirect the user to the appropriate TOTP verification page.
 
 ---
 
-## Route Mappings
+## Events
 
-```toml
-# If using TOTP plugin, keep /totp/verify and /totp/verify-backup-code accessible
-# to the pending-token flow (do not require an existing session cookie).
-[[route_mappings]]
-path = "/totp/verify"
-method = "POST"
-plugins = ["session.auth.optional"]
+The TOTP plugin emits events that can be used to trigger custom business logic or integrate with other plugins via the event bus.
 
-[[route_mappings]]
-path = "/totp/verify-backup-code"
-method = "POST"
-plugins = ["session.auth.optional"]
-```
+### Event Hooks
+
+The TOTP plugin emits events for the following operations:
+
+- `totp.enabled` — Fired when TOTP is enabled for a user
+- `totp.disabled` — Fired when TOTP is disabled for a user
+- `totp.verified` — Fired when a TOTP code is successfully verified
+- `totp.backup_code_used` — Fired when a backup code is used
+- `totp.device_trusted` — Fired when a device is marked as trusted
+
+These events can be subscribed to via the event bus for logging, analytics, or custom business logic.
+
+### Route Mappings
+
+When using the TOTP plugin, keep `/totp/verify` and `/totp/verify-backup-code` accessible to the pending-token flow (do not force authentication on these routes).
+
+---
+
+## Security Recommendations
+
+- **Secure Cookies** — In production, always set `secure_cookie = true` to ensure cookies are only sent over HTTPS.
+- **Pending Token Expiry** — The pending token used to access verify routes expires in 5 minutes by default. Configure based on your security requirements.
+- **Backup Codes** — Store backup codes securely. They are single-use and provide account recovery.
+- **Trusted Devices** — Use appropriate `trusted_device_duration` values. Shorter durations increase security but require more frequent TOTP verification.
+- **Password Verification** — Set `skip_verification_on_enable = false` to require password verification when enabling TOTP.
 
 ---
 
@@ -265,13 +265,3 @@ export const authulaClient = createClient({
   ],
 });
 ```
-
----
-
-## Security Considerations
-
-1. **Secure Cookies**: In production, always set `secure_cookie = true` to ensure cookies are only sent over HTTPS.
-2. **Pending Token Expiry**: The pending token used to access verify routes expires in 10 minutes by default. Configure based on your security requirements.
-3. **Backup Codes**: Store backup codes securely. They are single-use and provide account recovery.
-4. **Trusted Devices**: Use appropriate `trusted_device_duration` values. Shorter durations increase security but require more frequent TOTP verification.
-5. **Password Verification**: Set `skip_verification_on_enable = false` to require password verification when enabling TOTP.
