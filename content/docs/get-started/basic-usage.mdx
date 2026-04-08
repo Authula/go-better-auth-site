@@ -7,32 +7,118 @@ title: Basic Usage
 ## Standalone Mode
 
 ```toml title="config.toml"
-# -- EMAIL PLUGIN --
+app_name = "Authula"
+base_url = "http://localhost:8080"
+base_path = "/api/auth"
+
+# -----------------------------------
+# - Database Configuration
+# -----------------------------------
+
+[database]
+provider = "sqlite"
+url = "app.db"
+
+# -----------------------------------
+# - Logger Configuration
+# -----------------------------------
+
+[logger]
+level = "debug"  # Options: "debug", "info", "warn", "error"
+
+# -----------------------------------
+# - Session Configuration
+# -----------------------------------
+
+[session]
+cookie_name = "authula.session_token"
+expires_in = "1h"
+update_age = "5m"
+cookie_max_age = "24h"
+secure = false
+http_only = true
+same_site = "lax"
+auto_cleanup = true
+cleanup_interval = "1m"
+max_sessions_per_user = 5
+
+# -----------------------------------
+# - Verification Configuration
+# -----------------------------------
+
+[verification]
+auto_cleanup = true
+cleanup_interval = "1m"
+
+# -----------------------------------
+# - Security Configuration
+# -----------------------------------
+
+[security]
+trusted_origins = [] # e.g., ["http://localhost:3000", ...]
+trusted_headers = [] # e.g., ["X-Real-IP", "CF-Connecting-IP" (cloudflare), ...]
+trusted_proxies = []
+# IMPORTANT CORS NOTE: If using the session plugin, the CORS plugin must specify exact allowed_origins.
+# Setting allowed_origins = ["*"] with allow_credentials = true is NOT allowed by browsers and will fail.
+# Example CORS configuration when using sessions:
+# allow_credentials = true
+# allowed_origins = ["http://localhost:3000"]
+[security.cors]
+allow_credentials = true
+allowed_origins = [] # If using session plugin, specify exact origins instead of "*"
+allowed_methods = ["OPTIONS", "GET", "POST", "PUT", "PATCH", "DELETE"]
+allowed_headers = ["Authorization", "Content-Type", "Cookie", "Set-Cookie"]
+exposed_headers = []
+max_age = "24h"
+
+# -----------------------------------
+# - Event Bus Configuration
+# -----------------------------------
+
+[event_bus]
+provider = "gochannel"
+prefix = ""
+max_concurrent_handlers = 100
+
+[event_bus.go_channel]
+buffer_size = 100
+
+# -----------------------------------
+# - Plugins Configuration
+# -----------------------------------
+
+[plugins]
+
+# --- Email Plugin ---
 
 [plugins.email]
 enabled = true
-provider = "smtp"  # Options: "smtp", "resend"
-# If using Resend, make sure to set RESEND_API_KEY environment variable.
-# Can also be set via FROM_ADDRESS environment variable
+provider = "smtp"
 from_address = "noreply@example.com"
 
-# -- EMAIL & PASSWORD PLUGIN --
+# --- Email/Password Plugin ---
 
 [plugins.email_password]
 enabled = true
 min_password_length = 8
-max_password_length = 32
+max_password_length = 128
 disable_sign_up = false
 require_email_verification = true
 auto_sign_in = true
 send_email_on_sign_up = true
+send_email_on_sign_in = false
+email_verification_expires_in = "24h"
+password_reset_expires_in = "1h"
+request_email_change_expires_in = "1h"
 
-# -- SESSION PLUGIN --
+# --- Session Plugin ---
 
 [plugins.session]
 enabled = true
 
-# -- ROUTE MAPPINGS --
+# -----------------------------------
+# - Route Mappings
+# -----------------------------------
 
 [[route_mappings]]
 path = "/me"
@@ -54,8 +140,6 @@ path = "/sign-out"
 method = "POST"
 plugins = ["session.auth"]
 ```
-
----
 
 ## Library Mode
 
@@ -83,21 +167,60 @@ func main() {
 
 	config := authulaconfig.NewConfig(
 		authulaconfig.WithAppName("YourAppName"),
+		authulaconfig.WithBasePath("/api/auth"),
 		authulaconfig.WithDatabase(authulamodels.DatabaseConfig{
 			Provider: "sqlite",
 			URL:      "app.db",
 		}),
-		// Or for PostgreSQL
-		// authulaconfig.WithDatabase(authulamodels.DatabaseConfig{
-		//		Provider:         "postgres",
-		//		ConnectionString: os.Getenv("DATABASE_URL"),
-		// }),
+		authulaconfig.WithLogger(authulamodels.LoggerConfig{
+			Level: "debug",
+		}),
+		authulaconfig.WithSession(authulamodels.SessionConfig{
+			CookieName:         "authula.session_token",
+			ExpiresIn:          time.Hour,
+			UpdateAge:          5 * time.Minute,
+			CookieMaxAge:       24 * time.Hour,
+			Secure:             false,
+			HttpOnly:           true,
+			SameSite:           "lax",
+			MaxSessionsPerUser: 5,
+			AutoCleanup:        true,
+			CleanupInterval:    time.Minute,
+		}),
+		authulaconfig.WithVerification(authulamodels.VerificationConfig{
+			AutoCleanup:     true,
+			CleanupInterval: time.Minute,
+		}),
+		authulaconfig.WithSecurity(authulamodels.SecurityConfig{
+			TrustedOrigins: []string{"http://localhost:3000"},
+			CORS: authulamodels.CORSConfig{
+				AllowCredentials: true,
+				AllowedOrigins:   []string{"http://localhost:3000"},
+				AllowedMethods:   []string{"OPTIONS", "GET", "POST", "PATCH", "PUT", "DELETE"},
+				AllowedHeaders:   []string{"Authorization", "Content-Type", "Cookie", "Set-Cookie"},
+				ExposedHeaders:   []string{},
+				MaxAge:           24 * time.Hour,
+			},
+		}),
+		authulaconfig.WithEventBus(authulamodels.EventBusConfig{
+			Provider: authulaevents.ProviderGoChannel,
+		}),
 		authulaconfig.WithRouteMappings(
 			[]authulamodels.RouteMapping{
 				{
 					Path:    "/me",
 					Method:  "GET",
 					Plugins: []string{"session.auth"},
+				},
+				{
+					Path:    "/sign-in",
+					Method:  "POST",
+					Plugins: []string{"session.auth.optional"},
+				},
+				{
+					Path:    "/sign-up",
+					Method:  "POST",
+					Plugins: []string{"session.auth.optional"},
 				},
 				{
 					Path:    "/sign-out",
@@ -114,9 +237,7 @@ func main() {
 			emailplugin.New(emailplugintypes.EmailPluginConfig{
 				Enabled:     true,
 				Provider:    emailplugintypes.ProviderSMTP,
-				// Or if using Resend, make sure to set RESEND_API_KEY environment variable.
-				// Provider: emailplugintypes.ProviderResend,
-				FromAddress: "YourApp@YourDomain.com",
+				FromAddress: "your_email@your_domain.com",
 			}),
 			emailpasswordplugin.New(emailpasswordplugintypes.EmailPasswordPluginConfig{
 				Enabled:                  true,
@@ -140,33 +261,16 @@ func main() {
 
 ---
 
-<CodeBlockTabs defaultValue="smtp" groupId="mail-provider" persist>
-    <CodeBlockTabsList>
-      <CodeBlockTabsTrigger value="smtp">
-        SMTP
-      </CodeBlockTabsTrigger>
+## Environment Variables
 
-      <CodeBlockTabsTrigger value="resend">
-      	Resend
-      </CodeBlockTabsTrigger>
-    </CodeBlockTabsList>
+```bash title=".env"
+SMTP_HOST="localhost"
+SMTP_PORT="465"
+SMTP_USER="your_user@your_domain.com"
+SMTP_PASS="your_password"
+```
 
-    <CodeBlockTab value="smtp">
-     ```bash title=".env"
-      SMTP_HOST="localhost"
-      SMTP_PORT="465"
-      SMTP_USER="YourUser@YourDomain.com"
-      SMTP_PASS="YourPassword"
-      ```
-    </CodeBlockTab>
-
-    <CodeBlockTab value="resend">
-      ```bash title=".env"
-      RESEND_API_KEY="re_xxxxxxxxxxxx"
-      ```
-    </CodeBlockTab>
-
-</CodeBlockTabs>
+---
 
 ## Testing the Setup
 

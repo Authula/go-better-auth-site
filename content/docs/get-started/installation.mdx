@@ -24,12 +24,11 @@ The following sections will guide you through both methods.
 ```toml title="config.toml"
 app_name = "Authula"
 base_url = "http://localhost:8080"
-base_path = "/auth"
+base_path = "/api/auth"
 
 [database]
 provider = "postgres"
-
-# ... other settings
+# ...
 ```
 
 </Step>
@@ -45,13 +44,10 @@ provider = "postgres"
 ```txt title=".env"
 # Path to your configuration file (e.g., ./config.toml) (optional)
 AUTHULA_CONFIG_PATH=
-
-# The base URL of your API
+# The base URL of your API (e.g., http://localhost:8080) (optional as it can be set in config.toml)
 AUTHULA_BASE_URL=
-
 # Used for encryption. Generate using `openssl rand -base64 50 | tr -dc 'A-Za-z0-9' | cut -c -40`
 AUTHULA_SECRET=
-
 # sqlite/postgres/mysql connection string
 AUTHULA_DATABASE_URL=
 ```
@@ -65,10 +61,9 @@ AUTHULA_DATABASE_URL=
 ```bash
 $ docker run -itd \
   -p 8080:8080 \
-  -v $(pwd)/config.toml:/home/appuser/config.toml \
-  -e AUTHULA_BASE_URL=http://localhost:8080 \
-  -e AUTHULA_SECRET=my-app-secret \
-  -e AUTHULA_DATABASE_URL=<your_connection_string> \
+  -v /path/to/config.toml:/home/appuser/config.toml \
+  -e AUTHULA_SECRET=... \
+  -e AUTHULA_DATABASE_URL=... \
   ghcr.io/authula/authula:latest
 ```
 
@@ -88,7 +83,7 @@ $ docker run -itd \
 Create a `.env` file in the root of your project and add the following environment variables:
 
 ```txt title=".env"
-# The base URL of your API
+# The base URL of your API (e.g., http://localhost:8080) (optional as it can be set in config.toml)
 AUTHULA_BASE_URL=
 
 # Used for encryption. Generate using `openssl rand -base64 50 | tr -dc 'A-Za-z0-9' | cut -c -40`
@@ -188,7 +183,7 @@ Authula supports multiple database providers. You can select a database provider
 
 ### Database migrations
 
-Authula runs all migrations (core & plugins) automatically when you create a new instance of the library so all the relevant database tables are created for you without any additional steps. This is done via [goose](https://github.com/pressly/goose) and migration files are embedded in the binary. But Authula also provides migration files which you can run manually against your database which you can find within the `migrations/` directories within the repository.
+Authula runs all migrations (core & plugins) automatically when you create a new instance of the library so all the relevant database tables are created for you without any additional steps. This is done via a custom migrator which utilises Bun ORM and raw SQL.
 
 </Step>
 
@@ -196,7 +191,7 @@ Authula runs all migrations (core & plugins) automatically when you create a new
 
 ### Authentication Methods
 
-Configure the authentication methods you want to use by choosing from the available plugins. Authula supports the Email/Password authentication method as a plugin and also OAuth2 providers such as Discord, GitHub and Google with more coming soon.
+Configure the authentication methods you want to use by choosing from the available plugins. Authula supports various authentication methods, including the Email/Password authentication method as a plugin and also the OAuth2 plugin with providers such as Discord, GitHub and Google with more coming soon.
 
 ```go
 import (
@@ -212,12 +207,7 @@ auth := authula.New(&authula.AuthConfig{
   Plugins: [
     emailpasswordplugin.New(emailpasswordplugintypes.EmailPasswordPluginConfig{
       Enabled:                  true,
-      MinPasswordLength:        8,
-      MaxPasswordLength:        32,
-      DisableSignUp:            false,
-      RequireEmailVerification: true,
-      AutoSignIn:               true,
-      SendEmailOnSignUp:        true,
+      // ...other configuration options
     }),
   ],
 })
@@ -234,18 +224,28 @@ To handle API requests, you need to integrate the Authula handlers in your API.
 This is an example of how it can be done with the standard library server:
 
 ```go
-// Initialise auth
-config := authulaconfig.NewConfig(/*...*/)
-auth := authula.New(&authula.AuthConfig{
-  Config:  config,
-  Plugins: [/*...*/],
-})
+import (
+  "log"
+  "net/http"
 
-// Start the server and mount the handler
-log.Fatal(http.ListenAndServe(":8080", auth.Handler()))
+  authula "github.com/Authula/authula"
+  authulaconfig "github.com/Authula/authula/config"
+)
+
+func main() {
+  // Initialise auth
+  config := authulaconfig.NewConfig(/*...*/)
+  auth := authula.New(&authula.AuthConfig{
+    Config:  config,
+    Plugins: [/*...*/],
+  })
+
+  // Start the server and mount the handler
+  log.Fatal(http.ListenAndServe(":8080", auth.Handler()))
+}
 ```
 
-Take a look at the [Integrations](/docs/integrations/routers) section to see how to integrate it with other frameworks.
+Take a look at the [Integrations](/docs/integrations/adapters) section to see how to integrate it with other libraries.
 
 </Step>
 
