@@ -1,14 +1,24 @@
 import Link from "next/link";
 
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Star } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { BorderBeam } from "@/components/ui/border-beam";
 import { CONSTANTS } from "@/constants/constants";
 import GitHubIcon from "../shared/icons/GitHubIcon";
+import { getGitHubRepoStars } from "@/services/server";
 
-export default function HeroSection() {
+const starFormatter = new Intl.NumberFormat("en", {
+  notation: "compact",
+  maximumFractionDigits: 1,
+});
+
+export default async function HeroSection() {
+  const githubStars = await getGitHubRepoStars();
+  const formattedStars =
+    githubStars !== null ? starFormatter.format(githubStars) : null;
+
   return (
     <section className="relative border-b border-dashed border-sky-950">
       <div className="absolute inset-0 -z-10 h-full w-full bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-size-[14px_24px] mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
@@ -61,9 +71,24 @@ export default function HeroSection() {
               size="lg"
               className="h-12 px-8 text-base"
             >
-              <Link href={CONSTANTS.githubRepoUrl} target="_blank">
+              <Link
+                href={CONSTANTS.githubRepoUrl}
+                target="_blank"
+                className="flex items-center gap-2"
+                aria-label={
+                  formattedStars
+                    ? `View on GitHub. ${formattedStars} stars.`
+                    : "View on GitHub"
+                }
+              >
                 <GitHubIcon className="mr-2 h-4 w-4" />
                 View on GitHub
+                {formattedStars ? (
+                  <span className="inline-flex items-center gap-1 rounded-full border border-sky-950/30 bg-sky-950/20 px-2 py-0.5 text-xs font-semibold tabular-nums text-foreground/80">
+                    <Star className="h-3 w-3 text-yellow-500" />
+                    {formattedStars}
+                  </span>
+                ) : null}
               </Link>
             </Button>
           </div>

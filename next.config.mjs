@@ -7,6 +7,14 @@ const config = {
   reactStrictMode: true,
   output: "standalone",
   reactCompiler: true,
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "avatars.githubusercontent.com",
+      },
+    ],
+  },
   async rewrites() {
     return [
       {
