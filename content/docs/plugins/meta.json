@@ -13,6 +13,7 @@
     "ratelimit",
     "secondary-storage",
     "session",
-    "totp"
+    "totp",
+    "organizations"
   ]
 }
