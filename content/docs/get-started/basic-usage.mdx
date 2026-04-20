@@ -17,14 +17,14 @@ base_path = "/api/auth"
 
 [database]
 provider = "sqlite"
-url = "app.db"
+url = "auth.db"
 
 # -----------------------------------
 # - Logger Configuration
 # -----------------------------------
 
 [logger]
-level = "debug"  # Options: "debug", "info", "warn", "error"
+level = "debug"
 
 # -----------------------------------
 # - Session Configuration
@@ -32,7 +32,7 @@ level = "debug"  # Options: "debug", "info", "warn", "error"
 
 [session]
 cookie_name = "authula.session_token"
-expires_in = "1h"
+expires_in = "24h"
 update_age = "5m"
 cookie_max_age = "24h"
 secure = false
@@ -55,19 +55,14 @@ cleanup_interval = "1m"
 # -----------------------------------
 
 [security]
-trusted_origins = [] # e.g., ["http://localhost:3000", ...]
-trusted_headers = [] # e.g., ["X-Real-IP", "CF-Connecting-IP" (cloudflare), ...]
+trusted_origins = ["http://localhost:3000"]
+trusted_headers = []
 trusted_proxies = []
-# IMPORTANT CORS NOTE: If using the session plugin, the CORS plugin must specify exact allowed_origins.
-# Setting allowed_origins = ["*"] with allow_credentials = true is NOT allowed by browsers and will fail.
-# Example CORS configuration when using sessions:
-# allow_credentials = true
-# allowed_origins = ["http://localhost:3000"]
 [security.cors]
 allow_credentials = true
-allowed_origins = [] # If using session plugin, specify exact origins instead of "*"
+allowed_origins = ["http://localhost:3000"]
 allowed_methods = ["OPTIONS", "GET", "POST", "PUT", "PATCH", "DELETE"]
-allowed_headers = ["Authorization", "Content-Type", "Cookie", "Set-Cookie"]
+allowed_headers = ["Authorization", "Content-Type", "Set-Cookie", "Cookie"]
 exposed_headers = []
 max_age = "24h"
 
@@ -120,24 +115,29 @@ enabled = true
 # - Route Mappings
 # -----------------------------------
 
+# Core routes
+
 [[route_mappings]]
-path = "/me"
-method = "GET"
+paths = ["GET:/me", "POST:/sign-out"]
 plugins = ["session.auth"]
 
+# Email/Password routes
+
 [[route_mappings]]
-path = "/sign-in"
-method = "POST"
+paths = [
+	"POST:/email-password/sign-in",
+	"POST:/email-password/sign-up",
+	"GET:/email-password/verify-email"
+]
 plugins = ["session.auth.optional"]
 
 [[route_mappings]]
-path = "/sign-up"
-method = "POST"
-plugins = ["session.auth.optional"]
-
-[[route_mappings]]
-path = "/sign-out"
-method = "POST"
+paths = [
+	"POST:/email-password/send-email-verification",
+	"POST:/email-password/request-password-reset",
+	"POST:/email-password/change-password",
+	"POST:/email-password/request-email-change",
+]
 plugins = ["session.auth"]
 ```
 
@@ -170,14 +170,14 @@ func main() {
 		authulaconfig.WithBasePath("/api/auth"),
 		authulaconfig.WithDatabase(authulamodels.DatabaseConfig{
 			Provider: "sqlite",
-			URL:      "app.db",
+			URL:      "auth.db",
 		}),
 		authulaconfig.WithLogger(authulamodels.LoggerConfig{
 			Level: "debug",
 		}),
 		authulaconfig.WithSession(authulamodels.SessionConfig{
 			CookieName:         "authula.session_token",
-			ExpiresIn:          time.Hour,
+			ExpiresIn:          24 * time.Hour,
 			UpdateAge:          5 * time.Minute,
 			CookieMaxAge:       24 * time.Hour,
 			Secure:             false,
@@ -197,7 +197,7 @@ func main() {
 				AllowCredentials: true,
 				AllowedOrigins:   []string{"http://localhost:3000"},
 				AllowedMethods:   []string{"OPTIONS", "GET", "POST", "PATCH", "PUT", "DELETE"},
-				AllowedHeaders:   []string{"Authorization", "Content-Type", "Cookie", "Set-Cookie"},
+				AllowedHeaders:   []string{"Authorization", "Content-Type", "Set-Cookie", "Cookie"},
 				ExposedHeaders:   []string{},
 				MaxAge:           24 * time.Hour,
 			},
@@ -207,24 +207,27 @@ func main() {
 		}),
 		authulaconfig.WithRouteMappings(
 			[]authulamodels.RouteMapping{
+				// Core routes
 				{
-					Path:    "/me",
-					Method:  "GET",
-					Plugins: []string{"session.auth"},
+					Paths:		[]string{"GET:/me", "POST:/sign-out"},
+					Plugins:	[]string{"session.auth"},
 				},
+				// Email/Password routes
 				{
-					Path:    "/sign-in",
-					Method:  "POST",
+					Paths:	[]string{
+						"POST:/email-password/sign-in",
+						"POST:/email-password/sign-up",
+						"GET:/email-password/verify-email",
+					},
 					Plugins: []string{"session.auth.optional"},
 				},
 				{
-					Path:    "/sign-up",
-					Method:  "POST",
-					Plugins: []string{"session.auth.optional"},
-				},
-				{
-					Path:    "/sign-out",
-					Method:  "POST",
+					Paths:	[]string{
+						"POST:/email-password/send-email-verification",
+						"POST:/email-password/request-password-reset",
+						"POST:/email-password/change-password",
+						"POST:/email-password/request-email-change",
+					},
 					Plugins: []string{"session.auth"},
 				},
 			},
@@ -237,16 +240,20 @@ func main() {
 			emailplugin.New(emailplugintypes.EmailPluginConfig{
 				Enabled:     true,
 				Provider:    emailplugintypes.ProviderSMTP,
-				FromAddress: "your_email@your_domain.com",
+				FromAddress: "email@domain.com",
 			}),
 			emailpasswordplugin.New(emailpasswordplugintypes.EmailPasswordPluginConfig{
-				Enabled:                  true,
-				MinPasswordLength:        8,
-				MaxPasswordLength:        32,
-				DisableSignUp:            false,
-				RequireEmailVerification: true,
-				AutoSignIn:               true,
-				SendEmailOnSignUp:        true,
+				Enabled:                  		true,
+				MinPasswordLength:        		8,
+				MaxPasswordLength:        		32,
+				DisableSignUp:            		false,
+				RequireEmailVerification: 		true,
+				AutoSignIn:               		true,
+				SendEmailOnSignUp:        		true,
+				SendEmailOnSignIn:        		false,
+				EmailVerificationExpiresIn:		24 * time.Hour,
+				PasswordResetExpiresIn:      	time.Hour,
+				RequestEmailChangeExpiresIn: 	time.Hour,
 			}),
 			sessionplugin.New(sessionplugin.SessionPluginConfig{
 				Enabled: true,
@@ -264,10 +271,10 @@ func main() {
 ## Environment Variables
 
 ```bash title=".env"
-SMTP_HOST="localhost"
+SMTP_HOST="domain.com"
 SMTP_PORT="465"
-SMTP_USER="your_user@your_domain.com"
-SMTP_PASS="your_password"
+SMTP_USER="username"
+SMTP_PASS="password"
 ```
 
 ---
@@ -277,7 +284,7 @@ SMTP_PASS="your_password"
 ### Sign Up
 
 ```bash
-curl -X POST http://localhost:8080/auth/sign-up \
+curl -X POST http://localhost:8080/api/auth/email-password/sign-up \
   -H "Content-Type: application/json" \
   -d '{"name": "John Doe", "email": "john.doe@example.com", "password": "password123"}'
 ```
@@ -285,14 +292,14 @@ curl -X POST http://localhost:8080/auth/sign-up \
 ### Sign In
 
 ```bash
-curl -X POST http://localhost:8080/auth/sign-in \
+curl -X POST http://localhost:8080/api/auth/email-password/sign-in \
   -H "Content-Type: application/json" \
   -d '{"email": "john.doe@example.com", "password": "password123"}'
 ```
 
-### Get Session
+### Get Authenticated User Info
 
 ```bash
-curl -X GET http://localhost:8080/auth/me \
+curl -X GET http://localhost:8080/api/auth/me \
   -H "Cookie: authula.session_token=your-session-token"
 ```
