@@ -1,0 +1,193 @@
+---
+title: Routes
+description: Learn how to define and manage routes in Authula using route mappings and disabled routes.
+---
+
+# Route Mappings
+
+Route mappings let you declare which plugins should run for specific routes without hard-coding that wiring into your application.
+
+Use route mappings when you want Authula to decide, from configuration, which capabilities apply to a route. This is the main way to connect plugin behaviour to HTTP endpoints in standalone deployments, and it also works in embedded applications through the Go configuration API.
+
+## Why use route mappings
+
+Route mappings make plugin routing explicit and easy to audit. Instead of spreading route-specific auth logic across handlers, you define the route once and assign the relevant plugin capabilities to it.
+
+That is useful when you want to:
+
+- protect a route with session authentication
+- apply optional auth to public endpoints
+- attach permissions to specific admin or account routes
+- keep route-to-plugin wiring in config instead of code
+
+## Configuration format
+
+In `config.toml`, route mappings are defined with repeated `[[route_mappings]]` tables.
+
+Each mapping can contain:
+
+- `paths` - one or more route patterns
+- `plugins` - plugin capabilities to run for those routes
+- `permissions` - optional permission names to associate with the route
+
+Example:
+
+```toml
+[[route_mappings]]
+paths = ["GET:/me", "POST:/sign-out"]
+plugins = ["session.auth"]
+
+[[route_mappings]]
+paths = ["POST:/email-password/sign-in"]
+plugins = ["session.auth.optional"]
+```
+
+## Supported path styles
+
+Route mapping paths support two forms:
+
+- `METHOD:/path` for a method-specific route
+- `/path` for a route that applies to all supported methods
+
+Examples:
+
+```toml
+[[route_mappings]]
+paths = ["GET:/access-control/roles/{role_id}"]
+plugins = ["session.auth"]
+
+[[route_mappings]]
+paths = ["/organizations/*"]
+plugins = ["session.auth"]
+```
+
+The second example applies to all HTTP methods for any route under `/organizations`.
+
+## Dynamic and wildcard routes
+
+Route mappings support parameterized patterns such as `{role_id}` and wildcard suffixes such as `/*`.
+
+Use parameterized patterns when the route has a stable shape but dynamic values:
+
+```toml
+[[route_mappings]]
+paths = [
+  "GET:/access-control/users/{user_id}/roles",
+  "DELETE:/access-control/users/{user_id}/roles/{role_id}",
+]
+plugins = ["session.auth"]
+```
+
+Use wildcard patterns when you want to cover a whole route subtree:
+
+```toml
+[[route_mappings]]
+paths = ["/organizations/*"]
+plugins = ["session.auth"]
+```
+
+## Multiple mappings for the same route
+
+You can define more than one mapping for the same route. Authula merges the plugin and permission lists for matching route keys, so you can build up route behaviour from multiple config entries.
+
+That makes it practical to separate concerns, for example one mapping for session handling and another for access-control permissions.
+
+## Base path behaviour
+
+If your app uses a base path such as `/api/auth`, Authula applies that base path when it builds the internal route metadata used by the router.
+
+That means a mapping like:
+
+```toml
+[[route_mappings]]
+paths = ["GET:/me"]
+plugins = ["session.auth"]
+```
+
+is treated as the base-path-aware route for your deployment, such as `GET:/api/auth/me` when the base path is `/api/auth`.
+
+---
+
+# Disabled Paths
+
+Disabled paths let you tell Authula to skip specific API routes entirely.
+
+Use this when a path should not go through Authula’s normal handling pipeline. This is different from route mappings: route mappings attach metadata such as plugin capabilities or permissions (via Access Control plugin) etc to a path, while disabled paths prevent the path from being processed by Authula at all.
+
+## Why use disabled paths
+
+Disabled paths are helpful when you want to:
+
+- Prevent exposing API routes of a plugin if you are building your own embedded application using Authula as a library
+- Exclude public or externally managed endpoints
+- Turn off specific route groups during development or testing
+
+## Configuration format
+
+Disabled paths are configured with the `disabled_paths` array in `config.toml`.
+
+Example:
+
+```toml
+disabled_paths = [
+  "GET:/email-password/request-email-change",
+  "/organizations",
+  "/admin/*",
+]
+```
+
+## Supported path styles
+
+Disabled paths support two forms:
+
+- `METHOD:/path` for a specific method and route
+- `/path` for all supported methods for a specific route
+- `/path/*` for all routes under that path since it's a wildcard subtree
+
+## Matching behavior
+
+Authula normalizes route patterns before checking them, so a disabled route can match:
+
+- a method-qualified route path such as `GET:/email-password/request-email-change`
+- a bare route path such as `/organizations`
+- a wildcard subtree such as `/organizations/*`
+
+If the request matches a disabled path, Authula skips the route during registration and does not process it through the usual handler path.
+
+## Base path behavior
+
+If your application uses a base path such as `/api/auth`, disabled-route matching is applied with that base path in mind.
+
+That means a disabled entry like:
+
+```toml
+disabled_paths = ["GET:/health"]
+```
+
+can still match the route as it exists under the configured base path.
+
+## Method-specific examples
+
+Use method-specific entries when only one HTTP method should be disabled:
+
+```toml
+disabled_paths = [
+  "GET:/admin",
+  "POST:/organizations",
+]
+```
+
+Use wildcard paths when all routes under a specific path should be skipped for a route subtree:
+
+```toml
+disabled_paths = ["/organizations/*"]
+```
+
+## Route mappings vs disabled paths
+
+These two features solve different problems:
+
+- route mappings declare what metadata should run for a route such as plugin capabilities or permissions, and the route is still processed by Authula regardless whether it has a mapping or not.
+- disabled paths declare that the route should not be processed by Authula at all, so it is skipped during route registration and is not handled by the HTTP handler.
+
+So if a route should remain available but require auth or permissions, use route mappings. If a route should be excluded from Authula processing, use disabled paths.
