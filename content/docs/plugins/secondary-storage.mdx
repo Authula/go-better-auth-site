@@ -74,13 +74,13 @@ This plugin doesn't expose any HTTP endpoints.
 
 ### Table: `key_value_store`
 
-| Field        | Type      | Key | Description             |
-| ------------ | --------- | --- | ----------------------- |
-| `key`        | string    | PK  | Storage key             |
-| `value`      | string    | -   | Serialized value        |
-| `expires_at` | timestamp | -   | When the entry expires  |
-| `created_at` | timestamp | -   | Record creation time    |
-| `updated_at` | timestamp | -   | Record last update time |
+| Field        | Type       | Key | Description             |
+| ------------ | ---------- | --- | ----------------------- |
+| `key`        | string     | PK  | Storage key             |
+| `value`      | string     | -   | Serialized value        |
+| `expires_at` | timestamp? | -   | When the entry expires  |
+| `created_at` | timestamp  | -   | Record creation time    |
+| `updated_at` | timestamp  | -   | Record last update time |
 
 Migrations are automatically handled when the plugin is initialized.
 

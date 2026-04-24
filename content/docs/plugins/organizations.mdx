@@ -136,7 +136,7 @@ This plugin creates the following database tables:
 | `owner_id`   | string    | FK  | Reference to the organization owner (user)    |
 | `name`       | string    | -   | Organization name                             |
 | `slug`       | string    | -   | URL-friendly organization identifier (unique) |
-| `logo`       | string    | ?   | Organization logo URL                         |
+| `logo`       | string?   | -   | Organization logo URL                         |
 | `metadata`   | JSON      | -   | Additional organization metadata              |
 | `created_at` | timestamp | -   | Record creation time                          |
 | `updated_at` | timestamp | -   | Record last update time                       |
@@ -173,7 +173,7 @@ This plugin creates the following database tables:
 | `organization_id` | string    | FK  | Reference to the organization  |
 | `name`            | string    | -   | Team name                      |
 | `slug`            | string    | -   | URL-friendly identifier        |
-| `description`     | string    | ?   | Description                    |
+| `description`     | string?   | -   | Description                    |
 | `metadata`        | JSON      | -   | Additional metadata            |
 | `created_at`      | timestamp | -   | Record creation time           |
 | `updated_at`      | timestamp | -   | Record last update time        |
@@ -266,9 +266,6 @@ import { OrganizationsPlugin } from "authula/plugins";
 
 export const authulaClient = createClient({
   url: "http://localhost:8080/auth",
-  plugins: [
-    // other plugins...
-    new OrganizationsPlugin(),
-  ],
+  plugins: [new OrganizationsPlugin()],
 });
 ```
