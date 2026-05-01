@@ -1,0 +1,124 @@
+---
+title: Programmatic APIs
+description: Learn how to use Authula's programmatic APIs in library mode for direct access to Authula functionality without the need of HTTP requests.
+---
+
+# Overview
+
+Authula can be embedded directly into a Go application. In library mode, you keep a handle to the `Auth` instance and call its exported APIs or the APIs exposed by enabled plugins. This allows you to access Authula's functionality directly without needing to send HTTP requests to the server or the need to go through the HTTP Request/Response cycle.
+
+---
+
+## Core API
+
+The top-level `Auth` type exposes the main programmatic entry point through its exported `Api` field.
+
+```go
+import (
+  "context"
+
+  "github.com/Authula/authula"
+  authulaconfig "github.com/Authula/authula/config"
+  authulamodels "github.com/Authula/authula/models"
+)
+
+config := authulaconfig.New(/*...*/)
+auth := authula.New(&authula.AuthConfig{
+	Config: config,
+	Plugins: []authulamodels.Plugin{},
+})
+
+// Fetch a user's profile and current session
+meResult, err := auth.Api.GetMe(context.Background(), "user ID")
+
+// Sign out a user from a session (defaults to most recent session if sessionID is nil and signOutAll is false)
+signOutResult, err := auth.Api.SignOut(context.Background(), "user ID", nil, new(false))
+```
+
+---
+
+## Plugin APIs
+
+Enabled plugins also expose programmatic APIs. The common pattern is:
+
+1. Create the plugin instance.
+2. Pass it into `authula.New(...)`.
+3. After initialization, call the plugin's exported `Api` field.
+
+`Method 1`:
+
+```go
+import (
+  "context"
+
+  "github.com/Authula/authula"
+  authulaconfig "github.com/Authula/authula/config"
+  authulamodels "github.com/Authula/authula/models"
+  emailpasswordplugin "github.com/Authula/authula/plugins/email-password"
+  emailpasswordplugintypes "github.com/Authula/authula/plugins/email-password"
+)
+
+// Create plugin instance before initialization so you can access it directly after initialization without looking it up from the plugin registry
+emailPasswordPlugin := emailpasswordplugin.New(emailpasswordplugintypes.EmailPasswordPluginConfig{})
+
+config := authulaconfig.New(/*...*/)
+auth := authula.New(&authula.AuthConfig{
+	Config: config,
+	Plugins: []authulamodels.Plugin{
+    emailPasswordPlugin,
+  },
+})
+
+// You can now easily access the plugin here
+user, err := emailPasswordPlugin.Api.SignIn(context.Background(), email, password, nil, nil, nil)
+```
+
+`Method 2:`
+
+```go
+import (
+  "context"
+
+  "github.com/Authula/authula"
+  authulaconfig "github.com/Authula/authula/config"
+  authulamodels "github.com/Authula/authula/models"
+  organizationsplugin "github.com/Authula/authula/plugins/organizations"
+  organizationsplugintypes "github.com/Authula/authula/plugins/organizations"
+)
+
+config := authulaconfig.New(/*...*/)
+auth := authula.New(&authula.AuthConfig{
+	Config: config,
+	Plugins: []authulamodels.Plugin{
+    emailPasswordPlugin,
+  },
+})
+
+// Look up the plugin from the registry after initialization
+organizationsPlugin, ok := auth.PluginRegistry.GetPlugin(authulamodels.PluginOrganizations.String()).(*organizations.OrganizationsPlugin)
+if !ok {
+  // You can return early here in your own code or handle it differently however you wish...
+  return
+}
+
+// Now you can use the plugin's API to perform actions programmatically
+organizations, err := organizationsPlugin.Api.GetAllOrganizations(context.Background(), "user ID")
+if err != nil {
+  // Handle error
+}
+```
+
+---
+
+## When To Use Which?
+
+- Use `auth.Api` for access to Authula's core APIs and functionality.
+- Use a plugin `Api` when you need access to functionality provided by a plugin.
+- Use the lower-level helpers only when you need custom routing or integration behavior e.g. composing Authula into a larger application.
+
+---
+
+## Notes
+
+- Core and plugin APIs are available after Authula instance initialization.
+- The exact API surface depends on which plugins you enable in `AuthConfig`.
